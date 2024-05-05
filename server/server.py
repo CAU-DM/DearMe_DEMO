@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template, session
 import copy
 import os
-import DearMe_BE.server.ai as ai
+import ai
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
