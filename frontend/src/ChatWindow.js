@@ -1,29 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 function ChatWindow({ messages, setMessages }) {
   const [inputText, setInputText] = useState("");
-  const [sender, setSender] = useState("me");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (event) => {
     setInputText(event.target.value);
   };
 
   const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSendClick();
     }
   };
 
   const handleSendClick = () => {
-    if (inputText.trim()) {
-      const newMessage = { text: inputText, sender: sender };
-      setMessages(messages => [...messages, newMessage]);
-      setInputText('');
-    }
-  };
+    if (!isLoading) {
+      let text = inputText.trim();
 
-  const toggleSender = () => {
-    setSender(sender => sender === "me" ? "gpt" : "me");
+      if (text) {
+        const newMessage = { text: text, sender: "me" };
+        setMessages((messages) => [...messages, newMessage]);
+        setInputText("");
+        setIsLoading(true);
+        fetch("/submit_form", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `user=testUser&message=${encodeURIComponent(text)}`,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Received response:", data);
+            setMessages((messages) => [
+              ...messages,
+              { text: data.message, sender: "gpt" },
+            ]);
+            setIsLoading(false);
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    }
   };
 
   return (
@@ -43,7 +61,6 @@ function ChatWindow({ messages, setMessages }) {
           placeholder="Type your message..."
         />
         <button onClick={handleSendClick}>Send</button>
-        <button onClick={toggleSender}> {sender.toUpperCase()}</button>
       </div>
     </div>
   );
