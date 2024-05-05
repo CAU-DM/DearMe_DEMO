@@ -1,16 +1,16 @@
-from flask import Flask, request, jsonify, render_template, session
+from flask import Flask, request, jsonify, session, send_from_directory
 import copy
 import os
 import ai
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='/')
 app.secret_key = os.urandom(24)
 
 @app.route('/')
 def index():
     session.pop('chat', None)
     session['chat'] = session.get('chat', copy.deepcopy(conversation_history))
-    return render_template('index.html')
+    return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/submit_form', methods=['POST'])
 def submit_form():
