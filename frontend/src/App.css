@@ -55,13 +55,13 @@
 
 .message {
   display: inline-flex;
-  min-width: 100px;
   max-width: 80%;
   padding: 8px 20px;
   margin: 5px 0;
-  border-radius: 10px;
+  border-radius: 0px 15px 15px 15px;
   word-break: break-all;
-  background-color: #f1f1f1;
+  background-color: #007bff;
+  color: white;
   align-items: flex-start;
   justify-content: flex-start;
   width: fit-content;
@@ -69,13 +69,9 @@
 
 .message.me {
   align-self: flex-end;
-  background-color: #007bff;
-  color: white;
-}
-
-.message.them {
-  align-self: flex-start;
+  border-radius: 15px 0px 15px 15px;
   background-color: #cccccc;
+  color: black;
 }
 
 .input-area {
