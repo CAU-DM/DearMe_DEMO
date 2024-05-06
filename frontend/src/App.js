@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import FeedPage from "./FeedPage";
 import ChatWindow from "./ChatWindow";
+import Header from "./Header";
 
 function App() {
   const [messages, setMessages] = useState([
@@ -17,11 +18,7 @@ function App() {
 
   return (
     <div className="App">
-      <div className="header">
-        <div className="header_content">
-          
-        </div>
-      </div>
+      <Header/>
       <div className="main_container">
         <FeedPage feeds={feeds} />
         <ChatWindow messages={messages} setMessages={setMessages} />
