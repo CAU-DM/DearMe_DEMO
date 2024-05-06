@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { IoIosSend } from "react-icons/io";
 
 function ChatWindow({ messages, setMessages }) {
   const [inputText, setInputText] = useState("");
@@ -60,7 +61,7 @@ function ChatWindow({ messages, setMessages }) {
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
         />
-        <button onClick={handleSendClick}>Send</button>
+        <i onClick={handleSendClick}><IoIosSend size={32}/></i>
       </div>
     </div>
   );
