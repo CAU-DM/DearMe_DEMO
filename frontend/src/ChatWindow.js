@@ -47,6 +47,10 @@ function ChatWindow({ messages, setMessages }) {
 
   return (
     <div className="chat-window">
+      <div className="chat-header">
+        <img src="logo512.png" alt="Profile" className="profile-picture" />
+        <span className="profile-name">DearMe</span>
+      </div>
       <div className="messages">
         {messages.map((message, index) => (
           <div key={index} className={`message ${message.sender}`}>
