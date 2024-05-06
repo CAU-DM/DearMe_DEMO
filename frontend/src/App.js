@@ -5,6 +5,7 @@ import ChatWindow from "./ChatWindow";
 import Header from "./Header";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [messages, setMessages] = useState([
     { text: "안녕? 오늘 하루는 어땠어?", sender: "gpt" },
   ]);
@@ -16,13 +17,25 @@ function App() {
     { image: "/img/cheon.png", text: dt_1 },
   ];
 
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
   return (
     <div className="App">
       <Header/>
-      <div className="main_container">
-        <FeedPage feeds={feeds} />
-        <ChatWindow messages={messages} setMessages={setMessages} />
-      </div>
+      {isLoggedIn ? (
+        <div className="main_container">
+          <FeedPage feeds={feeds} />
+          <ChatWindow messages={messages} setMessages={setMessages} />
+        </div>
+      ) : (
+        <div><button onClick={handleLogin}>login</button></div>
+      )}
     </div>
   );
 }
