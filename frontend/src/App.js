@@ -3,6 +3,7 @@ import "./App.css";
 import FeedPage from "./FeedPage";
 import ChatWindow from "./ChatWindow";
 import Header from "./Header";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -34,7 +35,10 @@ function App() {
           <ChatWindow messages={messages} setMessages={setMessages} />
         </div>
       ) : (
-        <div><button onClick={handleLogin}>login</button></div>
+        <div>
+          <button onClick={handleLogin}>login</button>
+          <GoogleLoginButton></GoogleLoginButton>
+        </div>
       )}
     </div>
   );
