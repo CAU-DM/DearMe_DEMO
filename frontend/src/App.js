@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import FeedPage from "./FeedPage";
 import ChatWindow from "./ChatWindow";
+import OAuthTest from "./OAuthTest";
 
 function App() {
   const [messages, setMessages] = useState([
@@ -17,6 +18,7 @@ function App() {
 
   return (
     <div className="App">
+      <OAuthTest />
       <FeedPage feeds={feeds} />
       <ChatWindow messages={messages} setMessages={setMessages} />
     </div>
