@@ -17,8 +17,15 @@ function App() {
 
   return (
     <div className="App">
-      <FeedPage feeds={feeds} />
-      <ChatWindow messages={messages} setMessages={setMessages} />
+      <div className="header">
+        <div className="header_content">
+          
+        </div>
+      </div>
+      <div className="main_container">
+        <FeedPage feeds={feeds} />
+        <ChatWindow messages={messages} setMessages={setMessages} />
+      </div>
     </div>
   );
 }
