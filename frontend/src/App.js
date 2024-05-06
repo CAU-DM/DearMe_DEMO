@@ -35,9 +35,13 @@ function App() {
           <ChatWindow messages={messages} setMessages={setMessages} />
         </div>
       ) : (
-        <div>
-          <button onClick={handleLogin}>login</button>
-          <GoogleLoginButton></GoogleLoginButton>
+        <div className="login-window">
+          <content>
+            <img src="logo512.png" alt="Profile"/>
+            <p>DearMe</p>
+            <GoogleLoginButton></GoogleLoginButton>
+            <button onClick={handleLogin}>임시 login 버튼</button>
+          </content>
         </div>
       )}
     </div>
