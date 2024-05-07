@@ -8,13 +8,11 @@ import {
 } from "firebase/auth";
 import { useState, useEffect } from "react";
 import styles from "./Login.module.css";
-function Login({ onLogin }) {
+function Login({ onLogin, setMessages }) {
   const [disabled, setDisabled] = useState(true);
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
-      if (user)
-      {
-        onLogin(user);
+      if (user) {
         fetch("/login-success", {
           method: "POST",
           headers: {
@@ -25,7 +23,25 @@ function Login({ onLogin }) {
             email: user.email,
             displayName: user.displayName,
           }),
-        });
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Success:', data); // 성공적인 결과 처리
+            setMessages(JSON.parse(data.messeges));
+            return (JSON.parse(data.messeges))
+          })
+          .then((log) => {
+            console.log(log);
+            onLogin(user);
+          })
+          .catch(error => {
+            console.error('Error:', error); // 오류 처리
+          });
       }
       else {
         onLogin(null);
@@ -35,13 +51,10 @@ function Login({ onLogin }) {
   }, []);
   function handleGoogleLogin() {
     setDisabled(true);
-    setPersistence(auth, browserLocalPersistence) // 로그인 정보를 localStorage에 저장
+    setPersistence(auth, browserLocalPersistence)
       .then(() => {
         const provider = new GoogleAuthProvider();
         return signInWithPopup(auth, provider);
-      })
-      .then((data) => {
-        onLogin(data.user);
       })
       .catch((err) => {
         console.log(err);
