@@ -65,7 +65,6 @@ def submit_form():
     tmpElement = Element.query.filter_by(user_id=session['uid']).order_by(Element.id.desc()).first()
     tmpElement.content = json.dumps(session['chat'], ensure_ascii=False)
     db.session.commit()
-    print("here", tmpElement.content)
     print(Element.query.order_by(Element.id.desc()).first())
     return jsonify({ "status": "success",
                     "message": response_message })
@@ -76,6 +75,9 @@ def generate_form():
 
     response_message = ai.generate_diary(client, session['chat'])
     session.modified = True
+    tmpElement = Element.query.filter_by(user_id=session['uid']).order_by(Element.id.desc()).first()
+    tmpElement.content = json.dumps(session['chat'], ensure_ascii=False)
+    db.session.commit()
     print("Chat history:", session['chat'])
 
     response_data = {
