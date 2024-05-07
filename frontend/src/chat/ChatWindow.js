@@ -26,10 +26,10 @@ function ChatWindow({ messages, setMessages }) {
 
   const handleSendClick = () => {
     if (!isLoading) {
-      let text = inputText.trim();
+      let content = inputText.trim();
 
-      if (text) {
-        const newMessage = { text: text, sender: "me" };
+      if (content) {
+        const newMessage = { content: content, role: "user" };
         setMessages((messages) => [...messages, newMessage]);
         setInputText("");
         setIsLoading(true);
@@ -39,14 +39,14 @@ function ChatWindow({ messages, setMessages }) {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: `user=testUser&message=${encodeURIComponent(text)}`,
+          body: `user=testUser&message=${encodeURIComponent(content)}`,
         })
           .then((response) => response.json())
           .then((data) => {
             console.log("Received response:", data);
             setMessages((messages) => [
               ...messages,
-              { text: data.message, sender: "gpt" },
+              { content: data.message, role: "assistant" },
             ]);
             setIsLoading(false);
           })
@@ -57,10 +57,10 @@ function ChatWindow({ messages, setMessages }) {
 
   const handleGenClick = () => {
     if (!isLoading) {
-      let text = "Generate.";
+      let content = "Generate.";
 
-      if (text) {
-        const newMessage = { text: text, sender: "me" };
+      if (content) {
+        const newMessage = { content: content, role: "user" };
         setMessages((messages) => [...messages, newMessage]);
         setInputText("");
         setIsLoading(true);
@@ -69,14 +69,14 @@ function ChatWindow({ messages, setMessages }) {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: `user=testUser&message=${encodeURIComponent(text)}`,
+          body: `user=testUser&message=${encodeURIComponent(content)}`,
         })
           .then((response) => response.json())
           .then((data) => {
             console.log("Received response:", data);
             setMessages((messages) => [
               ...messages,
-              { text: data.message, sender: "gpt" },
+              { content: data.message, role: "assistant" },
             ]);
             setIsLoading(false);
           })
@@ -86,10 +86,10 @@ function ChatWindow({ messages, setMessages }) {
   };
 
   return (
-    <div className={ styles.chat_window }>
-      <div className={ styles.chat_header }>
-        <img src="logo512.png" alt="Profile" className={ styles.profile_picture } />
-        <span className={ styles.profile_name }>DearMe</span>
+    <div className={styles.chat_window}>
+      <div className={styles.chat_header}>
+        <img src="logo512.png" alt="Profile" className={styles.profile_picture} />
+        <span className={styles.profile_name}>DearMe</span>
       </div>
       <div className={styles.messages}>
         {messages.map((message, index) => {
@@ -98,20 +98,22 @@ function ChatWindow({ messages, setMessages }) {
               <PhotoDrop key={index} />
             );
           } else {
-            let messageClass = message.sender === "me" ? styles.message_me : styles.message_gpt;
-            return (
-              <div key={index} className={messageClass}>
-                {message.text}
-              </div>
-            );
+            let messageClass = message.role === "user" ? styles.message_user : styles.message_assistant;
+            if (message.role === "user" || message.role === "assistant") {
+              return (
+                <div key={index} className={messageClass}>
+                  {message.content}
+                </div>
+              );
+            }
           }
         })}
         <div ref={chatEndRef}></div>
       </div>
-      <div className={ styles.input_area }>
+      <div className={styles.input_area}>
         {
           sendCount > 9 ? (
-            <i onClick={handleGenClick}><CiCirclePlus size={32}/></i>
+            <i onClick={handleGenClick}><CiCirclePlus size={32} /></i>
           ) : (
             <i onClick={handleSendClick}></i>
           )
@@ -122,7 +124,7 @@ function ChatWindow({ messages, setMessages }) {
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
         />
-        <i onClick={handleSendClick}><IoIosSend size={32}/></i>
+        <i onClick={handleSendClick}><IoIosSend size={32} /></i>
       </div>
     </div>
   );
