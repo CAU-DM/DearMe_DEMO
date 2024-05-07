@@ -157,7 +157,7 @@
   width: fit-content;
 }
 
-.message.me {
+.message.user {
   align-self: flex-end;
   border-radius: 15px 0px 15px 15px;
   background-color: #eeeeee;
