@@ -61,7 +61,8 @@ export function Login({ onLogin }) {
   );
 }
 
-export function Logout({ onLogin }) {
+export function LogoutButton({ onLogin, windowWidth }) {
+  const btnText = windowWidth > 1080 ? 'Logout' : '';
   function handleLogout() {
     auth.signOut()
       .then(() => {
@@ -72,10 +73,10 @@ export function Logout({ onLogin }) {
       });
   }
   return (
-    <div>
+    <div className={styles.logout_btn}>
       <button onClick={handleLogout}>
-        <RiLogoutBoxRLine/>
-        Logout
+        <RiLogoutBoxRLine size={20}/>
+        <p>{ btnText }</p>
       </button>
     </div>
   );

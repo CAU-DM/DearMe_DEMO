@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Logout } from './login/Login';
+import { LogoutButton } from './login/Login';
 
 function Header({ onLogin }) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -21,7 +21,9 @@ function Header({ onLogin }) {
   return (
     <div className="header">
       <img src={imageUrl} alt="Logo" />
-      <Logout onLogin={onLogin}/>
+      <div>
+        <LogoutButton onLogin={onLogin} windowWidth={windowWidth}/>
+      </div>
     </div>
   );
 }
