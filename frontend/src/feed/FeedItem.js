@@ -44,7 +44,6 @@ function FeedItem({ date, image, content }) {
       ) : (
         <p className={styles.content}>{content}</p>
       )}
-      <hr color='#cccccc' size='1'/>
     </div>
   );
 }
