@@ -110,8 +110,8 @@ function ChatWindow({ messages, setMessages }) {
       </div>
       <div className={ styles.input_area }>
         {
-          sendCount > 5 ? (
-            <i onClick={handleSendClick}><CiCirclePlus size={32}/></i>
+          sendCount > 9 ? (
+            <i onClick={handleGenClick}><CiCirclePlus size={32}/></i>
           ) : (
             <i onClick={handleSendClick}></i>
           )
@@ -122,7 +122,7 @@ function ChatWindow({ messages, setMessages }) {
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
         />
-        <i onClick={handleGenClick}><IoIosSend size={32}/></i>
+        <i onClick={handleSendClick}><IoIosSend size={32}/></i>
       </div>
     </div>
   );
