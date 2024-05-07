@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import FeedPage from "./FeedPage";
 import ChatWindow from "./ChatWindow";
-import Login from "./Login";
+import Login from "./login/Login";
 import Header from "./Header";
 
 function App() {
