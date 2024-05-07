@@ -103,7 +103,7 @@ def create_openai_client():
 #     return response.choices[0].message.content.strip()
 
 def generate_chat(client, user_input, conversation_history):
-    conversation_history.append({"role": "user", "content": user_input})
+    conversation_history.append({"content": user_input, "role": "user"})
     conversation_history = trim_conversation_history(conversation_history)
     
     response = client.chat.completions.create(
