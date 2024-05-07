@@ -1,11 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
 import PhotoDrop from "./PhotoDrop";
 import { IoIosSend } from "react-icons/io";
+import { CiCirclePlus } from "react-icons/ci";
 import styles from "./Chat.module.css";
 
 function ChatWindow({ messages, setMessages }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sendCount, setSendCount] = useState(0);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -31,6 +33,7 @@ function ChatWindow({ messages, setMessages }) {
         setMessages((messages) => [...messages, newMessage]);
         setInputText("");
         setIsLoading(true);
+        setSendCount((count) => count + 1);
         fetch("/submit_form", {
           method: "POST",
           headers: {
@@ -76,6 +79,13 @@ function ChatWindow({ messages, setMessages }) {
         <div ref={chatEndRef}></div>
       </div>
       <div className={ styles.input_area }>
+        {
+          sendCount > 5 ? (
+            <i onClick={handleSendClick}><CiCirclePlus size={32}/></i>
+          ) : (
+            <i onClick={handleSendClick}></i>
+          )
+        }
         <input
           value={inputText}
           onChange={handleInputChange}
