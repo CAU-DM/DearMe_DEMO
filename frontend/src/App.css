@@ -1,3 +1,7 @@
+body, html {
+  overflow: hidden;
+}
+
 .App {
   height: 100vh;
   display: flex;
@@ -14,6 +18,7 @@
   flex-direction: column;
   align-content: start;
   align-items: start;
+  justify-content: space-between;
   padding: 0px 5px;
   background-color: #22232c;
 }
@@ -233,6 +238,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    align-content: center;
+    justify-content: space-between;
   }
 
   .header img {
@@ -259,7 +266,7 @@
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 7px;
 }
 
 ::-webkit-scrollbar-track {
@@ -267,12 +274,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(201, 201, 201);
+  background-color: rgb(221, 221, 221);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: grey;
+  background: #cccccc;
 }
 
 .scrollbar {

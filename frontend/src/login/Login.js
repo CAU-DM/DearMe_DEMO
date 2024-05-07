@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { useState, useEffect } from "react";
 import styles from "./Login.module.css";
+import { RiLogoutBoxRLine } from "react-icons/ri";
 function Login({ onLogin, setMessages }) {
   const [disabled, setDisabled] = useState(true);
   useEffect(() => {
@@ -70,7 +71,7 @@ function Login({ onLogin, setMessages }) {
         <p>DearMe</p>
         <button
           type="button"
-          className={styles.login_with_google_btn}
+          className={ styles.login_with_google_btn }
           onClick={() => handleGoogleLogin(1)}
           disabled={disabled}
         >
@@ -80,4 +81,26 @@ function Login({ onLogin, setMessages }) {
     </div>
   );
 }
-export default Login;
+
+export function LogoutButton({ onLogin, windowWidth }) {
+  const btnText = windowWidth > 1080 ? 'Logout' : '';
+  function handleLogout() {
+    auth.signOut()
+      .then(() => {
+        onLogin(null)
+      })
+      .catch((error) => {
+        console.error('Sign out error', error);
+      });
+  }
+  return (
+    <div className={styles.logout_btn}>
+      <button onClick={handleLogout}>
+        <RiLogoutBoxRLine size={20}/>
+        <p>{ btnText }</p>
+      </button>
+    </div>
+  );
+}
+
+export default Login
