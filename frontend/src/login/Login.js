@@ -50,7 +50,7 @@ export function Login({ onLogin }) {
         <p>DearMe</p>
         <button
           type="button"
-          className={styles.login_with_google_btn}
+          className={ styles.login_with_google_btn }
           onClick={() => handleGoogleLogin(1)}
           disabled={disabled}
         >

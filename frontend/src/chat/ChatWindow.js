@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { IoIosSend } from "react-icons/io";
+import styles from "./Chat.module.css";
 
 function ChatWindow({ messages, setMessages }) {
   const [inputText, setInputText] = useState("");
@@ -51,20 +52,26 @@ function ChatWindow({ messages, setMessages }) {
   };
 
   return (
-    <div className="chat-window">
-      <div className="chat-header">
-        <img src="logo512.png" alt="Profile" className="profile-picture" />
-        <span className="profile-name">DearMe</span>
+    <div className={ styles.chat_window }>
+      <div className={ styles.chat_header }>
+        <img src="logo512.png" alt="Profile" className={ styles.profile_picture } />
+        <span className={ styles.profile_name }>DearMe</span>
       </div>
-      <div className="messages">
+      <div className={ styles.messages }>
         {messages.map((message, index) => (
-          <div key={index} className={`message ${message.sender}`}>
-            {message.text}
-          </div>
+            message.sender === "me" ? (
+              <div key={index} className={styles.message_me}>
+                {message.text}
+              </div>
+            ) : (
+              <div key={index} className={styles.message_gpt}>
+                {message.text}
+              </div>
+            )
         ))}
         <div ref={chatEndRef}></div>
       </div>
-      <div className="input-area">
+      <div className={ styles.input_area }>
         <input
           value={inputText}
           onChange={handleInputChange}
