@@ -7,9 +7,7 @@ import Header from "./Header";
 
 function App() {
   const [userData, setUserData] = useState(null);
-  const [messages, setMessages] = useState([
-    { role: "gpt", content: "안녕? 오늘 하루는 어땠어?"},
-  ]);
+  const [messages, setMessages] = useState([]);
 
   const dt_0 =
     "이제 슬슬 꽃도 피고 점점 따뜻해지고 있다. 이게 정말 봄이 오고 있는 느낌이다. 수업 쉬는시간에 팀원이 천혜향을 가져와서 나눠먹고, 밤에는 친한 동기랑 술도 마셨다. 좋은 사람들과 함께해서인지 날씨가 좋아서인지 오늘은 정말 기분이 좋은 날이었다 !";
@@ -28,7 +26,7 @@ function App() {
           <ChatWindow messages={messages} setMessages={setMessages} />
         </div>
       ) : (
-        <Login onLogin={setUserData}/>
+        <Login onLogin={setUserData} setMessages={setMessages}/>
       )}
     </div>
   );
