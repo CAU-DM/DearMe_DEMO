@@ -8,10 +8,8 @@ import {
 } from "firebase/auth";
 import { useState, useEffect } from "react";
 import styles from "./Login.module.css";
-
 function Login({ onLogin }) {
   const [disabled, setDisabled] = useState(true);
-
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) onLogin(user);
@@ -21,26 +19,36 @@ function Login({ onLogin }) {
       }
     });
   }, []);
-
   function handleGoogleLogin() {
     setDisabled(true);
     setPersistence(auth, browserLocalPersistence) // 로그인 정보를 localStorage에 저장
       .then(() => {
         const provider = new GoogleAuthProvider();
-        return signInWithPopup(auth, provider)
+        return signInWithPopup(auth, provider);
       })
       .then((data) => {
-        console.log(data)
-        onLogin(data.user); // App 컴포넌트에 사용자 정보 전달
+        onLogin(data.user);
+        return fetch("/login-success", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            uid: data.user.uid,
+            email: data.user.email,
+            displayName: data.user.displayName,
+          }),
+        });
       })
+      .then((response) => response.json())
+      .then((serverResponse) => console.log("Server response:", serverResponse))
       .catch((err) => {
         console.log(err);
-        onLogin(null); // 오류 발생 시 로그인 정보 없음으로 처리
+        onLogin(null);
         auth.signOut();
         setDisabled(false);
       });
   }
-
   return (
     <div className="login-window">
       <div>
@@ -58,5 +66,4 @@ function Login({ onLogin }) {
     </div>
   );
 }
-
 export default Login;
