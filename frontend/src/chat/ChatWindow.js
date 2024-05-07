@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import PhotoDrop from "./PhotoDrop";
 import { IoIosSend } from "react-icons/io";
 import styles from "./Chat.module.css";
 
@@ -57,18 +58,21 @@ function ChatWindow({ messages, setMessages }) {
         <img src="logo512.png" alt="Profile" className={ styles.profile_picture } />
         <span className={ styles.profile_name }>DearMe</span>
       </div>
-      <div className={ styles.messages }>
-        {messages.map((message, index) => (
-            message.sender === "me" ? (
-              <div key={index} className={styles.message_me}>
+      <div className={styles.messages}>
+        {messages.map((message, index) => {
+          if (message.sender === "photo") {
+            return (
+              <PhotoDrop key={index} />
+            );
+          } else {
+            let messageClass = message.sender === "me" ? styles.message_me : styles.message_gpt;
+            return (
+              <div key={index} className={messageClass}>
                 {message.text}
               </div>
-            ) : (
-              <div key={index} className={styles.message_gpt}>
-                {message.text}
-              </div>
-            )
-        ))}
+            );
+          }
+        })}
         <div ref={chatEndRef}></div>
       </div>
       <div className={ styles.input_area }>

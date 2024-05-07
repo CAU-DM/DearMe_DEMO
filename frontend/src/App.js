@@ -4,11 +4,12 @@ import FeedPage from "./feed/FeedPage";
 import ChatWindow from "./chat/ChatWindow";
 import Login from "./login/Login";
 import Header from "./Header";
+import PhotoDrop from "./chat/PhotoDrop";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [messages, setMessages] = useState([
-    { text: "안녕? 오늘 하루는 어땠어?", sender: "gpt" },
+    { text: "안녕? 오늘 하루는 어땠어?", sender: "gpt" }
   ]);
 
   const dt_0 =
