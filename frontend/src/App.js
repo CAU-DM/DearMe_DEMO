@@ -6,9 +6,9 @@ import Login from "./login/Login";
 import Header from "./Header";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [messages, setMessages] = useState([
-    { text: "안녕? 오늘 하루는 어땠어?", sender: "gpt" },
+    { role: "gpt", content: "안녕? 오늘 하루는 어땠어?"},
   ]);
 
   const dt_0 =
@@ -22,13 +22,13 @@ function App() {
   return (
     <div className="App">
       <Header />
-      {isLoggedIn ? (
+      {userData ? (
         <div className="main_container">
           <FeedPage feeds={feeds} />
           <ChatWindow messages={messages} setMessages={setMessages} />
         </div>
       ) : (
-        <Login onLogin={setIsLoggedIn}/>
+        <Login onLogin={setUserData}/>
       )}
     </div>
   );

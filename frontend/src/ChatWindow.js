@@ -20,7 +20,7 @@ function ChatWindow({ messages, setMessages }) {
       let text = inputText.trim();
 
       if (text) {
-        const newMessage = { text: text, sender: "me" };
+        const newMessage = { role: "me", content: text };
         setMessages((messages) => [...messages, newMessage]);
         setInputText("");
         setIsLoading(true);
@@ -36,7 +36,7 @@ function ChatWindow({ messages, setMessages }) {
             console.log("Received response:", data);
             setMessages((messages) => [
               ...messages,
-              { text: data.message, sender: "gpt" },
+              { role: "gpt", content: data.message },
             ]);
             setIsLoading(false);
           })
@@ -53,8 +53,8 @@ function ChatWindow({ messages, setMessages }) {
       </div>
       <div className="messages">
         {messages.map((message, index) => (
-          <div key={index} className={`message ${message.sender}`}>
-            {message.text}
+          <div key={index} className={`message ${message.role}`}>
+            {message.content}
           </div>
         ))}
       </div>
