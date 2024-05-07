@@ -53,9 +53,11 @@ function ChatWindow({ messages, setMessages }) {
       </div>
       <div className="messages">
         {messages.map((message, index) => (
-          <div key={index} className={`message ${message.role}`}>
-            {message.content}
-          </div>
+          (message.role === "me" || message.role === "gpt") ? (
+            <div key={index} className={`message ${message.role}`}>
+              {message.content}
+            </div>
+          ) : null
         ))}
       </div>
       <div className="input-area">
@@ -65,7 +67,7 @@ function ChatWindow({ messages, setMessages }) {
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
         />
-        <i onClick={handleSendClick}><IoIosSend size={32}/></i>
+        <i onClick={handleSendClick}><IoIosSend size={32} /></i>
       </div>
     </div>
   );
