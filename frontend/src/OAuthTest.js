@@ -6,7 +6,6 @@ import {
   browserLocalPersistence,
 } from "firebase/auth";
 import { useState, useEffect } from "react";
-import styles from "./OAuthTest.module.css";
 
 function OAuthTest({ onLogin }) {
   useEffect(() => {
@@ -31,11 +30,22 @@ function OAuthTest({ onLogin }) {
   }
 
   return (
-    <div className={styles.container}>
-      <h3 className={styles.title}>DearMe</h3>
-      <button className={styles.loginButton} onClick={handleGoogleLogin}>
-        구글로 로그인
-      </button>
+    // <div className={styles.container}>
+    //   <h3 className={styles.title}>DearMe</h3>
+    //   <button className={styles.loginButton} onClick={handleGoogleLogin}>
+    //     구글로 로그인
+    //   </button>
+    // </div>
+    <div className="login-window">
+      <content>
+        <img src="logo512.png" alt="Profile" />
+        <p>DearMe</p>
+        <button onClick={handleGoogleLogin}>
+          구글로 로그인
+        </button>
+      
+        {/* <button onClick={onLogin(true)}>임시 login 버튼</button> */}
+      </content>
     </div>
   );
 }
