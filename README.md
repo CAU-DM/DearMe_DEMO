@@ -31,11 +31,11 @@ REACT_APP_MEASUREMENTID="{FILL}"
 ```
 and then
 ```bash
-chmod +x initialize.sh && sh initialize.sh
+chmod +x initialize.sh && bash initialize.sh
 ``` 
 
 ### 3. Start the Server
 
 ```bash
-chmod +x start_server.sh && ./start_server.sh
+chmod +x start_server.sh && bash start_server.sh
 ```
