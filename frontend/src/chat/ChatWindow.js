@@ -1,9 +1,18 @@
-import React, { useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
+import PhotoDrop from "./PhotoDrop";
 import { IoIosSend } from "react-icons/io";
+import { CiCirclePlus } from "react-icons/ci";
+import styles from "./Chat.module.css";
 
 function ChatWindow({ messages, setMessages }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sendCount, setSendCount] = useState(0);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleInputChange = (event) => {
     setInputText(event.target.value);
@@ -24,6 +33,7 @@ function ChatWindow({ messages, setMessages }) {
         setMessages((messages) => [...messages, newMessage]);
         setInputText("");
         setIsLoading(true);
+        setSendCount((count) => count + 1);
         fetch("/submit_form", {
           method: "POST",
           headers: {
@@ -76,19 +86,36 @@ function ChatWindow({ messages, setMessages }) {
   };
 
   return (
-    <div className="chat-window">
-      <div className="chat-header">
-        <img src="logo512.png" alt="Profile" className="profile-picture" />
-        <span className="profile-name">DearMe</span>
+    <div className={ styles.chat_window }>
+      <div className={ styles.chat_header }>
+        <img src="logo512.png" alt="Profile" className={ styles.profile_picture } />
+        <span className={ styles.profile_name }>DearMe</span>
       </div>
-      <div className="messages">
-        {messages.map((message, index) => (
-          <div key={index} className={`message ${message.sender}`}>
-            {message.text}
-          </div>
-        ))}
+      <div className={styles.messages}>
+        {messages.map((message, index) => {
+          if (message.sender === "photo") {
+            return (
+              <PhotoDrop key={index} />
+            );
+          } else {
+            let messageClass = message.sender === "me" ? styles.message_me : styles.message_gpt;
+            return (
+              <div key={index} className={messageClass}>
+                {message.text}
+              </div>
+            );
+          }
+        })}
+        <div ref={chatEndRef}></div>
       </div>
-      <div className="input-area">
+      <div className={ styles.input_area }>
+        {
+          sendCount > 5 ? (
+            <i onClick={handleSendClick}><CiCirclePlus size={32}/></i>
+          ) : (
+            <i onClick={handleSendClick}></i>
+          )
+        }
         <input
           value={inputText}
           onChange={handleInputChange}
