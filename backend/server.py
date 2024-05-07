@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, session, send_from_directory
+import json
 from flask_sqlalchemy import SQLAlchemy
 import copy
 import os
@@ -14,13 +15,12 @@ db = SQLAlchemy(app)
 class Element(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String(30), nullable=False)
-    content_id = db.Column(db.Integer, nullable=False)
-    content = db.Column(db.Text, nullable=True)
+    feedId = db.Column(db.Integer, nullable=False)
+    feed = db.Column(db.Text, nullable=True)
     image_path = db.Column(db.String(100), nullable=True)
-    chat = db.Column(db.Text, nullable=False)
-
+    content = db.Column(db.Text, nullable=False)
     def __repr__(self):
-        return f"Element('{self.user_id}', '{self.content_id}', '{self.content}', '{self.image_path}', '{self.chat}')"
+        return f"Element('{self.user_id}', '{self.feedId}', '{self.feed}', '{self.image_path}', '{self.content}')"
 
 with app.app_context():
     db.drop_all()
@@ -29,39 +29,47 @@ with app.app_context():
 @app.route('/')
 def index():
     session.pop('chat', None)
-    session['chat'] = session.get('chat', copy.deepcopy(conversation_history))
-    # tmp = Element(id=1, user_id='test', content_id=1, chat="")
-    # db.session.add(tmp)
-    # db.session.commit()
-    # print(Element.query.all())
     return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/login-success', methods=['POST'])
 def login_success():
+    global tmpElement
     user_data = request.json
     uid = user_data['uid']
     email = user_data['email']
     displayName = user_data['displayName']
     
-    # 받은 데이터를 처리하는 로직 (데이터베이스에 저장 등)
-    print(f"UID: {uid}, Email: {email}, DisplayName: {displayName}")
-    
-    # 서버의 응답
-    return jsonify({'status': 'success', 'message': '로그인 정보가 성공적으로 처리되었습니다.'})
+    nextId = Element.query.count() + 1
+    print(f"UID: {uid}, Email: {email}, DisplayName: {displayName}, nextId: {nextId}")
+    uIdList = Element.query.filter_by(user_id=uid).order_by(Element.id.desc()).first()
+    if (uIdList is None):
+        tmp = Element(id=nextId, user_id=uid, feedId=nextId, content=json.dumps(conversation_history, ensure_ascii=False))
+        db.session.add(tmp)
+        db.session.commit()
+        tmpElement = tmp;
+    else:
+        tmpElement = uIdList
+        print("already exist")
+
+    session['chat'] = session.get('chat', json.loads(tmpElement.content))
+    return jsonify({"messeges": tmpElement.content})
 
 @app.route('/submit_form', methods=['POST'])
 def submit_form():
     global client
 
+    print("Chat history:", session['chat'], "Message:", request.form['message'])
     response_message = ai.generate_chat(client, request.form['message'], session['chat'])
     session.modified = True
-    # print("Chat history:", session['chat'])
-    return jsonify({ 'status': 'success',
-                    'message': response_message })
+    print("Chat history:", session['chat'])
+    return jsonify({ "status": "success",
+                    "message": response_message })
 
 if __name__ == '__main__':
     client = ai.create_openai_client()
-    conversation_history = [{"role": "system", "content": ai.system_prompt}]
+    conversation_history = [{"role": "system", "content": ai.system_prompt},
+                            {"role": "gpt", "content": "안녕? 오늘 하루는 어땠어?"}]
     ai.system_token = ai.num_tokens_from_messages(conversation_history, model=ai.MODEL)
     ai.encoding = ai.tiktoken.encoding_for_model(ai.MODEL)
+    tmpElement = Element()
     app.run(debug=True)
