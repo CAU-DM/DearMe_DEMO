@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { IoIosSend } from "react-icons/io";
 
 function ChatWindow({ messages, setMessages }) {
   const [inputText, setInputText] = useState("");
@@ -46,6 +47,10 @@ function ChatWindow({ messages, setMessages }) {
 
   return (
     <div className="chat-window">
+      <div className="chat-header">
+        <img src="logo512.png" alt="Profile" className="profile-picture" />
+        <span className="profile-name">DearMe</span>
+      </div>
       <div className="messages">
         {messages.map((message, index) => (
           <div key={index} className={`message ${message.sender}`}>
@@ -60,7 +65,7 @@ function ChatWindow({ messages, setMessages }) {
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
         />
-        <button onClick={handleSendClick}>Send</button>
+        <i onClick={handleSendClick}><IoIosSend size={32}/></i>
       </div>
     </div>
   );
