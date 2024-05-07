@@ -7,31 +7,35 @@
 - Python 3.8 or higher
 - pip3
 
-## Installation and Execution
+## DearMe Demo Project Setup Guide
 
-### 0. clone
+### 1. Clone the Repository
 ```bash
-git clone https://github.com/CAU-DM/DearMe_BE.git
+git clone https://github.com/CAU-DM/DearMe_DEMO && cd DearMe_DEMO
 ```
 
-### 1. Frontend Setup
+### 2. Configure Environment Variables
 
-```bash
-cd frontend
-npm install
-npm run build
-cd ..
-```
-
-### 2. Backend Setup & Execution
+Before running the application, you need to configure environment variables. Open the `initialize.sh` script and fill in all the placeholders (`{FILL}`) with your actual configuration keys:
 
 ```bash
-cd backend
-python3 -m venv myenv
-source myenv/bin/activate
-pip3 install -r requirements.txt
+# Set environment variables
+API_KEY="{FILL}"
+REACT_APP_APIKEY="{FILL}"
+REACT_APP_AUTHDOMAIN="{FILL}"
+REACT_APP_PROJECTID="{FILL}"
+REACT_APP_STORAGEBUCKET="{FILL}"
+REACT_APP_MESSAGINGSENDERID="{FILL}"
+REACT_APP_APPID="{FILL}"
+REACT_APP_MEASUREMENTID="{FILL}"
 ```
-```
-echo "API_KEY={YOUR_CHAT_GPT_API_KEY}" > .env
-python3 -u server.py
+and then
+```bash
+chmod +x initialize.sh && sh initialize.sh
+``` 
+
+### 3. Start the Server
+
+```bash
+chmod +x start_server.sh && ./start_server.sh
 ```
