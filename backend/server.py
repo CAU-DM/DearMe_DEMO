@@ -52,6 +52,7 @@ def login_success():
         print(tmpElement.content)
 
     session['chat'] = session.get('chat', json.loads(tmpElement.content))
+    session['uid'] = session.get('uid', uid)
     return jsonify({"messeges": tmpElement.content})
 
 @app.route('/submit_form', methods=['POST'])
@@ -60,10 +61,11 @@ def submit_form():
 
     print("Chat history:", session['chat'], "Message:", request.form['message'])
     response_message = ai.generate_chat(client, request.form['message'], session['chat'])
-    tmpElement = Element.query.filter_by(user_id=session['chat'][0]['content']).order_by(Element.id.desc()).first()
-    print("here", session['tmpElement'].content)
     session.modified = True
+    tmpElement = Element.query.filter_by(user_id=session['uid']).order_by(Element.id.desc()).first()
+    tmpElement.content = json.dumps(session['chat'], ensure_ascii=False)
     db.session.commit()
+    print("here", tmpElement.content)
     print(Element.query.order_by(Element.id.desc()).first())
     return jsonify({ "status": "success",
                     "message": response_message })
