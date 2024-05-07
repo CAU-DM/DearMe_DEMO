@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { IoIosSend } from "react-icons/io";
 
 function ChatWindow({ messages, setMessages }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleInputChange = (event) => {
     setInputText(event.target.value);
@@ -57,6 +62,7 @@ function ChatWindow({ messages, setMessages }) {
             {message.text}
           </div>
         ))}
+        <div ref={chatEndRef}></div>
       </div>
       <div className="input-area">
         <input
