@@ -1,0 +1,29 @@
+.feed_page {
+    max-width: 630px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .feed_item {
+    width: 100%;
+    height: 0;
+    position: relative;
+  }
+  
+  .feed_item img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+  
+  .feed_item p {
+    padding: 8px;
+  }
