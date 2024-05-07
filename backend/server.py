@@ -30,11 +30,24 @@ with app.app_context():
 def index():
     session.pop('chat', None)
     session['chat'] = session.get('chat', copy.deepcopy(conversation_history))
-    tmp = Element(id=1, user_id='test', content_id=1, chat="")
-    db.session.add(tmp)
-    db.session.commit()
-    print(Element.query.all())
+    # tmp = Element(id=1, user_id='test', content_id=1, chat="")
+    # db.session.add(tmp)
+    # db.session.commit()
+    # print(Element.query.all())
     return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/login-success', methods=['POST'])
+def login_success():
+    user_data = request.json
+    uid = user_data['uid']
+    email = user_data['email']
+    displayName = user_data['displayName']
+    
+    # 받은 데이터를 처리하는 로직 (데이터베이스에 저장 등)
+    print(f"UID: {uid}, Email: {email}, DisplayName: {displayName}")
+    
+    # 서버의 응답
+    return jsonify({'status': 'success', 'message': '로그인 정보가 성공적으로 처리되었습니다.'})
 
 @app.route('/submit_form', methods=['POST'])
 def submit_form():
