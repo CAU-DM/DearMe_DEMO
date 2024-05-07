@@ -8,8 +8,10 @@ import {
 } from "firebase/auth";
 import { useState, useEffect } from "react";
 import styles from "./Login.module.css";
+import { RiLogoutBoxRLine } from "react-icons/ri";
 
-function Login({ onLogin }) {
+
+export function Login({ onLogin }) {
   const [disabled, setDisabled] = useState(true);
 
   useEffect(() => {
@@ -59,4 +61,24 @@ function Login({ onLogin }) {
   );
 }
 
-export default Login;
+export function Logout({ onLogin }) {
+  function handleLogout() {
+    auth.signOut()
+      .then(() => {
+        onLogin(null)
+      })
+      .catch((error) => {
+        console.error('Sign out error', error);
+      });
+  }
+  return (
+    <div>
+      <button onClick={handleLogout}>
+        <RiLogoutBoxRLine/>
+        Logout
+      </button>
+    </div>
+  );
+}
+
+export default Login

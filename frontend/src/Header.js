@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Logout } from './login/Login';
 
-function Header() {
+function Header({ onLogin }) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ function Header() {
   return (
     <div className="header">
       <img src={imageUrl} alt="Logo" />
+      <Logout onLogin={onLogin}/>
     </div>
   );
 }

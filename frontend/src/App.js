@@ -21,7 +21,7 @@ function App() {
 
   return (
     <div className="App">
-      <Header />
+      <Header onLogin={setIsLoggedIn}/>
       {isLoggedIn ? (
         <div className="main_container">
           <FeedPage feeds={feeds} />
