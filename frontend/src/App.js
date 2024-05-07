@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import FeedPage from "./FeedPage";
 import ChatWindow from "./ChatWindow";
-import OAuthTest from "./OAuthTest";
+import Login from "./Login";
 import Header from "./Header";
 
 function App() {
@@ -28,7 +28,7 @@ function App() {
           <ChatWindow messages={messages} setMessages={setMessages} />
         </div>
       ) : (
-        <OAuthTest onLogin={setIsLoggedIn}/>
+        <Login onLogin={setIsLoggedIn}/>
       )}
     </div>
   );
