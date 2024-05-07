@@ -45,6 +45,36 @@ function ChatWindow({ messages, setMessages }) {
     }
   };
 
+  const handleGenClick = () => {
+    if (!isLoading) {
+      let text = "Generate.";
+
+      if (text) {
+        const newMessage = { text: text, sender: "me" };
+        setMessages((messages) => [...messages, newMessage]);
+        setInputText("");
+        setIsLoading(true);
+        fetch("/generate_form", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `user=testUser&message=${encodeURIComponent(text)}`,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Received response:", data);
+            setMessages((messages) => [
+              ...messages,
+              { text: data.message, sender: "gpt" },
+            ]);
+            setIsLoading(false);
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    }
+  };
+
   return (
     <div className="chat-window">
       <div className="chat-header">
@@ -65,7 +95,7 @@ function ChatWindow({ messages, setMessages }) {
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
         />
-        <i onClick={handleSendClick}><IoIosSend size={32}/></i>
+        <i onClick={handleGenClick}><IoIosSend size={32}/></i>
       </div>
     </div>
   );
