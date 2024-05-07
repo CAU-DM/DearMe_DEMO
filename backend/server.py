@@ -23,7 +23,6 @@ class Element(db.Model):
         return f"Element('{self.user_id}', '{self.feedId}', '{self.feed}', '{self.image_path}', '{self.content}')"
 
 with app.app_context():
-    db.drop_all()
     db.create_all()
 
 @app.route('/')
@@ -33,7 +32,6 @@ def index():
 
 @app.route('/login-success', methods=['POST'])
 def login_success():
-    global tmpElement
     user_data = request.json
     uid = user_data['uid']
     email = user_data['email']
@@ -47,9 +45,11 @@ def login_success():
         db.session.add(tmp)
         db.session.commit()
         tmpElement = tmp;
+        print("New user added")
     else:
         tmpElement = uIdList
-        print("already exist")
+        print("User already exists")
+        print(tmpElement.content)
 
     session['chat'] = session.get('chat', json.loads(tmpElement.content))
     return jsonify({"messeges": tmpElement.content})
@@ -60,16 +60,18 @@ def submit_form():
 
     print("Chat history:", session['chat'], "Message:", request.form['message'])
     response_message = ai.generate_chat(client, request.form['message'], session['chat'])
+    tmpElement = Element.query.filter_by(user_id=session['chat'][0]['content']).order_by(Element.id.desc()).first()
+    print("here", session['tmpElement'].content)
     session.modified = True
-    print("Chat history:", session['chat'])
+    db.session.commit()
+    print(Element.query.order_by(Element.id.desc()).first())
     return jsonify({ "status": "success",
                     "message": response_message })
 
 if __name__ == '__main__':
     client = ai.create_openai_client()
     conversation_history = [{"role": "system", "content": ai.system_prompt},
-                            {"role": "gpt", "content": "안녕? 오늘 하루는 어땠어?"}]
+                            {"role": "assistant", "content": "안녕? 오늘 하루는 어땠어?"}]
     ai.system_token = ai.num_tokens_from_messages(conversation_history, model=ai.MODEL)
     ai.encoding = ai.tiktoken.encoding_for_model(ai.MODEL)
-    tmpElement = Element()
     app.run(debug=True)
