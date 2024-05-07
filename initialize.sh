@@ -12,7 +12,7 @@ REACT_APP_MEASUREMENTID="{FILL}"
 
 # 프론트엔드 설정 및 빌드
 cd frontend
-npm install && npm run build
+npm install
 cd ..
 
 # 백엔드 설정 및 가상 환경 구성
