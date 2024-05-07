@@ -26,6 +26,20 @@ def submit_form():
     }
     return jsonify(response_data)
 
+@app.route('/generate_diary', methods=['POST'])
+def submit_form():
+    global client
+
+    response_message = ai.generate_diary(client, session['chat'])
+    session.modified = True
+    print("Chat history:", session['chat'])
+
+    response_data = {
+        'status': 'success',
+        'message': response_message
+    }
+    return jsonify(response_data)
+
 if __name__ == '__main__':
     client = ai.create_openai_client()
     conversation_history = [{"role": "system", "content": ai.system_prompt}]
