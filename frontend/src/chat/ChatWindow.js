@@ -7,7 +7,6 @@ import styles from "./Chat.module.css";
 function ChatWindow({ messages, setMessages }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [sendCount, setSendCount] = useState(0);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -33,7 +32,6 @@ function ChatWindow({ messages, setMessages }) {
         setMessages((messages) => [...messages, newMessage]);
         setInputText("");
         setIsLoading(true);
-        setSendCount((count) => count + 1);
         fetch("/submit_form", {
           method: "POST",
           headers: {
@@ -112,7 +110,7 @@ function ChatWindow({ messages, setMessages }) {
       </div>
       <div className={styles.input_area}>
         {
-          sendCount > 9 ? (
+          messages.length > 18 ? (
             <i onClick={handleGenClick}><CiCirclePlus size={32} /></i>
           ) : (
             <i onClick={handleSendClick}></i>
