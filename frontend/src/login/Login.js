@@ -12,7 +12,21 @@ function Login({ onLogin }) {
   const [disabled, setDisabled] = useState(true);
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
-      if (user) onLogin(user);
+      if (user)
+      {
+        onLogin(user);
+        fetch("/login-success", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+          }),
+        });
+      }
       else {
         onLogin(null);
         setDisabled(false);
@@ -28,20 +42,7 @@ function Login({ onLogin }) {
       })
       .then((data) => {
         onLogin(data.user);
-        return fetch("/login-success", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            uid: data.user.uid,
-            email: data.user.email,
-            displayName: data.user.displayName,
-          }),
-        });
       })
-      .then((response) => response.json())
-      .then((serverResponse) => console.log("Server response:", serverResponse))
       .catch((err) => {
         console.log(err);
         onLogin(null);
