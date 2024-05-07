@@ -26,8 +26,8 @@ def submit_form():
     }
     return jsonify(response_data)
 
-@app.route('/generate_diary', methods=['POST'])
-def submit_form():
+@app.route('/generate_form', methods=['POST'])
+def generate_form():
     global client
 
     response_message = ai.generate_diary(client, session['chat'])
@@ -42,7 +42,7 @@ def submit_form():
 
 if __name__ == '__main__':
     client = ai.create_openai_client()
-    conversation_history = [{"role": "system", "content": ai.system_prompt}]
+    conversation_history = [{"role": "system", "content": ai.dialog_system_prompt}]
     ai.system_token = ai.num_tokens_from_messages(conversation_history, model=ai.MODEL)
     ai.encoding = ai.tiktoken.encoding_for_model(ai.MODEL)
     app.run(debug=True)
