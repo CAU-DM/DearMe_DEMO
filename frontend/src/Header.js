@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { LogoutButton } from './login/Login';
+import React, { useState, useEffect } from "react";
+import { LogoutButton, UserInfo } from "./login/Login";
 
-function Header({ onLogin }) {
+function Header({ userData }) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
@@ -9,21 +9,24 @@ function Header({ onLogin }) {
       setWindowWidth(window.innerWidth);
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  const imageUrl = windowWidth > 1080 ? 'logo_text_c.png' : 'logo512_nb.png';
+  const imageUrl = windowWidth > 1080 ? "logo_text_c.png" : "logo512_nb.png";
 
   return (
     <div className="header">
       <img src={imageUrl} alt="Logo" />
-      <div>
-        <LogoutButton onLogin={onLogin} windowWidth={windowWidth}/>
-      </div>
+      {userData ? (
+        <div>
+          <UserInfo userData={userData} windowWidth={windowWidth} />
+          <LogoutButton userData={userData} windowWidth={windowWidth} />
+        </div>
+      ) : null}
     </div>
   );
 }

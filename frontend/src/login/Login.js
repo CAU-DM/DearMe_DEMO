@@ -1,48 +1,69 @@
 import { auth } from "./firebase-config";
+import { useState, useEffect } from "react";
 import {
   GoogleAuthProvider,
-  GithubAuthProvider,
   signInWithPopup,
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
-import { useState, useEffect } from "react";
+import { RiLogoutBoxRLine, RiUserFollowLine } from "react-icons/ri";
 import styles from "./Login.module.css";
-import { RiLogoutBoxRLine } from "react-icons/ri";
 
-
-export function Login({ onLogin }) {
+function Login({ setUserData, setMessages }) {
   const [disabled, setDisabled] = useState(true);
-
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
-      if (user) onLogin(user);
-      else {
-        onLogin(null);
+      if (user) {
+        fetch("/login-success", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Success:", data); // 성공적인 결과 처리
+            setMessages(JSON.parse(data.messeges));
+            return JSON.parse(data.messeges);
+          })
+          .then((log) => {
+            console.log(log);
+            setUserData(user);
+            console.log(user);
+          })
+          .catch((error) => {
+            console.error("Error:", error); // 오류 처리
+          });
+      } else {
+        setUserData(null);
         setDisabled(false);
       }
     });
   }, []);
-
   function handleGoogleLogin() {
     setDisabled(true);
-    setPersistence(auth, browserLocalPersistence) // 로그인 정보를 localStorage에 저장
+    setPersistence(auth, browserLocalPersistence)
       .then(() => {
         const provider = new GoogleAuthProvider();
-        return signInWithPopup(auth, provider)
-      })
-      .then((data) => {
-        console.log(data)
-        onLogin(data.user); // App 컴포넌트에 사용자 정보 전달
+        return signInWithPopup(auth, provider);
       })
       .catch((err) => {
         console.log(err);
-        onLogin(null); // 오류 발생 시 로그인 정보 없음으로 처리
+        setUserData(null);
         auth.signOut();
         setDisabled(false);
       });
   }
-
   return (
     <div className="login-window">
       <div>
@@ -50,7 +71,7 @@ export function Login({ onLogin }) {
         <p>DearMe</p>
         <button
           type="button"
-          className={ styles.login_with_google_btn }
+          className={styles.login_with_google_btn}
           onClick={() => handleGoogleLogin(1)}
           disabled={disabled}
         >
@@ -61,25 +82,30 @@ export function Login({ onLogin }) {
   );
 }
 
-export function LogoutButton({ onLogin, windowWidth }) {
-  const btnText = windowWidth > 1080 ? 'Logout' : '';
+export function LogoutButton({ userData, windowWidth }) {
   function handleLogout() {
-    auth.signOut()
-      .then(() => {
-        onLogin(null)
-      })
-      .catch((error) => {
-        console.error('Sign out error', error);
-      });
+    auth.signOut();
+    window.location.reload();
   }
   return (
     <div className={styles.logout_btn}>
       <button onClick={handleLogout}>
-        <RiLogoutBoxRLine size={20}/>
-        <p>{ btnText }</p>
+        <RiLogoutBoxRLine size={20} />
+        <p>{windowWidth > 1080 ? "Logout" : ""}</p>
       </button>
     </div>
   );
 }
 
-export default Login
+export function UserInfo({ userData, windowWidth }) {
+  return (
+    <div className={styles.logout_btn}>
+      <button>
+        <RiUserFollowLine size={20} />
+        <p>{windowWidth > 1080 ? userData.displayName : ""}</p>
+      </button>
+    </div>
+  );
+}
+
+export default Login;

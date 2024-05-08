@@ -3,6 +3,7 @@ import tiktoken
 import openai
 import os
 import warnings
+
 warnings.filterwarnings("ignore")
 
 generate_added_prompt = """
@@ -76,6 +77,7 @@ token_user_gpt4 = len(gpt4_encoding.encode("user"))
 token_assistant_gpt3 = len(gpt3_encoding.encode("assistant")) 
 token_assistant_gpt4 = len(gpt4_encoding.encode("assistant"))
 
+
 def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613"):
     """Return the number of tokens used by a list of messages."""
     try:
@@ -90,7 +92,7 @@ def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613"):
         "gpt-4-32k-0314",
         "gpt-4-0613",
         "gpt-4-32k-0613",
-        }:
+    }:
         tokens_per_message = 3
         tokens_per_name = 1
     else:
@@ -138,25 +140,11 @@ def trim_conversation_history(history, max_tokens, model, response_token):
         total_tokens -= 6
     return history
 
+
 def create_openai_client():
     load_dotenv()
-    return openai.OpenAI(api_key=os.getenv('API_KEY'))
+    return openai.OpenAI(api_key=os.getenv("API_KEY"))
 
-# def generate_answer(client, user_input):
-#     global conversation_history
-#     conversation_history.append({"role": "user", "content": user_input})
-#     conversation_history = trim_conversation_history(conversation_history)
-    
-#     response = client.chat.completions.create(
-#         # model="gpt-3.5-turbo",
-#         model=MODEL,
-#         messages=conversation_history,
-#         max_tokens=1000,
-#         temperature=0.7
-#     )
-#     conversation_history.append({"role": "assistant", "content": response.choices[0].message.content.strip()})
-    
-#     return response.choices[0].message.content.strip()
 
 def generate_chat(client, user_input, conversation_history):
     model = "gpt-3.5-turbo-0613"
@@ -172,15 +160,17 @@ def generate_chat(client, user_input, conversation_history):
     conversation_history.append(
         {"role": "assistant", "content": response.choices[0].message.content.strip()}
     )
-    conversation_history.append({"role": "assistant", "content": response.choices[0].message.content.strip()})
-    
+
     return response.choices[0].message.content.strip()
+
 
 def generate_diary(client, conversation_history):
     model="gpt-4-0613"
     response_token = 1_500
     conversation_history.pop(0)
-    conversation_history.insert(0, {"role": "system", "content": generate_system_prompt})
+    conversation_history.insert(
+        0, {"role": "system", "content": generate_system_prompt}
+    )
     conversation_history.append({"role": "user", "content": generate_added_prompt})
     conversation_history = trim_conversation_history(conversation_history, 8_192, model, response_token)
 
@@ -190,20 +180,8 @@ def generate_diary(client, conversation_history):
         max_tokens = response_token,
         temperature = 0.7,
     )
-    conversation_history.append({"role": "assistant", "content": response.choices[0].message.content.strip()})
-    
+    conversation_history.append(
+        {"role": "assistant", "content": response.choices[0].message.content.strip()}
+    )
+    conversation_history[-2]["content"] = "Generate."
     return response.choices[0].message.content.strip()
-
-# if __name__ == '__main__':
-#     # 클라이언트 인스턴스 생성
-#     client = create_openai_client()
-
-#     while True:
-#         user_input = input("당신: ")
-#         if user_input.lower() == "exit":
-#             print("대화를 종료합니다.")
-#             break
-#         answer = generate_answer(client, user_input)
-#         print("봇: ", answer)
-#         if user_input.lower() == "generate":
-#             break
