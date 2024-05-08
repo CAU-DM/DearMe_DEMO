@@ -46,4 +46,4 @@ if __name__ == '__main__':
         {"role": "system", "content": ai.dialog_system_prompt},
         {"role": "assistant", "content": "안녕? 오늘 하루는 어땠어?"},
     ]
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host=os.getenv('INTERNAL_IP'), port=5000, debug=True)
