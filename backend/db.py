@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
 
 db = SQLAlchemy()
 
@@ -7,6 +8,7 @@ class Element(db.Model):
     user_id = db.Column(db.String(30), nullable=False)
     feedId = db.Column(db.Integer, nullable=False)
     feed = db.Column(db.Text, nullable=True)
+    feedTime = db.Column(db.DateTime, nullable=True),
     state = db.Column(db.Integer, nullable=True)
     image_path = db.Column(db.String(100), nullable=True)
     content = db.Column(db.Text, nullable=False)
