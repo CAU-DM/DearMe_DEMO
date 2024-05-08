@@ -7,6 +7,7 @@ import os
 import ai
 import db
 
+
 def create_app():
     app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
     app.secret_key = os.urandom(24)
@@ -14,16 +15,19 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.db.init_app(app)
     with app.app_context():
-        db.db.drop_all()
+        # db.db.drop_all()
         db.db.create_all()
     return app
 
+
 app = create_app()
+
 
 @app.route("/")
 def index():
     session.pop("chat", None)
     return send_from_directory(app.static_folder, "index.html")
+
 
 @app.route("/login-success", methods=["POST"])
 def login_success():
@@ -34,7 +38,9 @@ def login_success():
 
     nextId = db.Element.query.count() + 1
     print(f"UID: {uid}, Email: {email}, DisplayName: {displayName}, nextId: {nextId}")
-    uIdList = db.Element.query.filter_by(user_id=uid).order_by(db.Element.id.desc()).first()
+    uIdList = (
+        db.Element.query.filter_by(user_id=uid).order_by(db.Element.id.desc()).first()
+    )
     if uIdList is None or uIdList.state == 1:
         tmp = db.Element(
             id=nextId,
@@ -46,7 +52,7 @@ def login_success():
         db.db.session.add(tmp)
         db.db.session.commit()
         tmpElement = tmp
-        print("New user added")
+        print("New element added")
     else:
         tmpElement = uIdList
         print("User already exists")
@@ -54,6 +60,7 @@ def login_success():
 
     session["chat"] = session.get("chat", json.loads(tmpElement.content))
     session["uid"] = session.get("uid", uid)
+    session["nowEleId"] = session.get("nowEleId", tmpElement.id)
     return jsonify({"messeges": tmpElement.content})
 
 
@@ -83,20 +90,23 @@ def generate_form():
 
     response_message = ai.generate_diary(client, session["chat"])
     session.modified = True
-    tmpElement = (
-        db.Element.query.filter_by(user_id=session["uid"])
-        .order_by(db.Element.id.desc())
-        .first()
-    )
+    tmpElement = db.Element.query.filter_by(id=session["nowEleId"]).first()
     tmpElement.content = json.dumps(session["chat"], ensure_ascii=False)
     tmpElement.state = 1
     tmpElement.feed = response_message
     tmpElement.feedTime = datetime.now()
     db.db.session.commit()
-    print("Chat history:", session["chat"])
+    print(db.Element.query.filter_by(user_id=session["uid"]).count(), "here!!!")
 
     response_data = {"status": "success", "message": response_message}
     return jsonify(response_data)
+
+
+@app.route("/get_feeds", methods=["GET"])
+def get_feeds():
+    feedList = db.Element.query.filter_by(user_id=session["uid"], state=1).all()
+    return jsonify({"feedList": [feed.serialize_feed() for feed in feedList]})
+
 
 if __name__ == "__main__":
     client = ai.create_openai_client()
