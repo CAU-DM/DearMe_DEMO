@@ -1,12 +1,44 @@
-import React from 'react';
-import FeedItem from './FeedItem';
-import styles from './Feed.module.css';
+import React, { useState, useEffect } from "react";
+import FeedItem from "./FeedItem";
+import styles from "./Feed.module.css";
 
-function FeedPage({ feeds }) {
+function FeedPage({ userData }) {
+  const [feeds, setFeeds] = useState([]);
+
+  useEffect(() => {
+    const fetchFeeds = async () => {
+      try {
+        const response = await fetch("/get_feeds", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Feed List:", data.feedList);
+        setFeeds(data.feedList);
+      } catch (error) {
+        console.error("Error fetching feeds:", error);
+      }
+    };
+    if (userData !== null) {
+      fetchFeeds();
+    }
+  }, [userData]);
+
   return (
-    <div className={ styles.feed_page }>
+    <div className={styles.feed_page}>
       {feeds.map((feed, index) => (
-        <FeedItem key={index} date = {feed.date} image={feed.image} content={feed.content} />
+        <FeedItem
+          key={index}
+          date={feed.feedTime}
+          // image={feed.image_url}
+          image={"/img/cheon.png"}
+          content={feed.feed}
+        />
       ))}
     </div>
   );
