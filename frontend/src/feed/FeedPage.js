@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import FeedItem from "./FeedItem";
 import styles from "./Feed.module.css";
 
-function FeedPage({ userData }) {
-  const [feeds, setFeeds] = useState([]);
-
+function FeedPage({ userData, feeds, setFeeds }) {
   useEffect(() => {
     const fetchFeeds = async () => {
       try {
@@ -12,11 +10,6 @@ function FeedPage({ userData }) {
           method: "GET",
           credentials: "include",
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const data = await response.json();
         console.log("Feed List:", data.feedList);
         setFeeds(data.feedList);
@@ -24,9 +17,7 @@ function FeedPage({ userData }) {
         console.error("Error fetching feeds:", error);
       }
     };
-    if (userData !== null) {
-      fetchFeeds();
-    }
+    if (userData !== null) fetchFeeds();
   }, [userData]);
 
   return (
