@@ -128,11 +128,7 @@ def trim_conversation_history(history, max_tokens, model, response_token):
         token_assistant = token_assistant_gpt4
 
     total_tokens = num_tokens_from_messages(history)
-    print("trim_conversation_history... debug....")
-    print("total token : ", total_tokens)
-    print("max token : ", max_tokens)
     while total_tokens > max_tokens - response_token:
-        print("debug : over maxtoken erasing.....")
         total_tokens -= len(encoding.encode(history.pop(1)["content"]))
         total_tokens -= len(encoding.encode(history.pop(1)["content"])) #고의로 두번임
         total_tokens -= token_user
