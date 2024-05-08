@@ -14,7 +14,7 @@ function App() {
 
   return (
     <div className="App">
-      <Header />
+      <Header userData={userData} />
       {userData ? (
         <div className="main_container">
           <FeedPage
@@ -31,7 +31,7 @@ function App() {
           />
         </div>
       ) : (
-        <Login onLogin={setUserData} setMessages={setMessages} />
+        <Login setUserData={setUserData} setMessages={setMessages} />
       )}
     </div>
   );
