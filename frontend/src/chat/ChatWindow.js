@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import PhotoDrop from "./PhotoDrop";
 import { IoIosSend } from "react-icons/io";
-import { CiCirclePlus, CiCloudRainbow } from "react-icons/ci";
+import { CiCirclePlus, CiCircleCheck } from "react-icons/ci";
 import styles from "./Chat.module.css";
 
 function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
@@ -144,7 +144,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
           </>
         ) : (
           <i onClick={() => window.location.reload()}>
-            <CiCloudRainbow size={32} />
+            <CiCircleCheck size={32} />
           </i>
         )}
       </div>
