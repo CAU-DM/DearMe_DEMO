@@ -167,8 +167,8 @@ def generate_diary(client, conversation_history):
     conversation_history = trim_conversation_history(conversation_history)
 
     response = client.chat.completions.create(
-        # model="gpt-3.5-turbo",
-        model=MODEL,
+        model="gpt-3.5-turbo",
+        # model=MODEL,
         messages=conversation_history,
         max_tokens=1000,
         temperature=0.7,
