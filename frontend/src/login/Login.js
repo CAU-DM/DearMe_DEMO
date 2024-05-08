@@ -1,15 +1,15 @@
 import { auth } from "./firebase-config";
+import { useState, useEffect } from "react";
 import {
   GoogleAuthProvider,
-  GithubAuthProvider,
   signInWithPopup,
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
-import { useState, useEffect } from "react";
+import { RiLogoutBoxRLine, RiUserFollowLine } from "react-icons/ri";
 import styles from "./Login.module.css";
-import { RiLogoutBoxRLine } from "react-icons/ri";
-function Login({ onLogin, setMessages }) {
+
+function Login({ setUserData, setMessages }) {
   const [disabled, setDisabled] = useState(true);
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
@@ -25,27 +25,27 @@ function Login({ onLogin, setMessages }) {
             displayName: user.displayName,
           }),
         })
-          .then(response => {
+          .then((response) => {
             if (!response.ok) {
-              throw new Error('Network response was not ok');
+              throw new Error("Network response was not ok");
             }
             return response.json();
           })
-          .then(data => {
-            console.log('Success:', data); // 성공적인 결과 처리
+          .then((data) => {
+            console.log("Success:", data); // 성공적인 결과 처리
             setMessages(JSON.parse(data.messeges));
-            return (JSON.parse(data.messeges))
+            return JSON.parse(data.messeges);
           })
           .then((log) => {
             console.log(log);
-            onLogin(user);
+            setUserData(user);
+            console.log(user);
           })
-          .catch(error => {
-            console.error('Error:', error); // 오류 처리
+          .catch((error) => {
+            console.error("Error:", error); // 오류 처리
           });
-      }
-      else {
-        onLogin(null);
+      } else {
+        setUserData(null);
         setDisabled(false);
       }
     });
@@ -59,7 +59,7 @@ function Login({ onLogin, setMessages }) {
       })
       .catch((err) => {
         console.log(err);
-        onLogin(null);
+        setUserData(null);
         auth.signOut();
         setDisabled(false);
       });
@@ -71,7 +71,7 @@ function Login({ onLogin, setMessages }) {
         <p>DearMe</p>
         <button
           type="button"
-          className={ styles.login_with_google_btn }
+          className={styles.login_with_google_btn}
           onClick={() => handleGoogleLogin(1)}
           disabled={disabled}
         >
@@ -82,25 +82,30 @@ function Login({ onLogin, setMessages }) {
   );
 }
 
-export function LogoutButton({ onLogin, windowWidth }) {
-  const btnText = windowWidth > 1080 ? 'Logout' : '';
+export function LogoutButton({ userData, windowWidth }) {
   function handleLogout() {
-    auth.signOut()
-      .then(() => {
-        onLogin(null)
-      })
-      .catch((error) => {
-        console.error('Sign out error', error);
-      });
+    auth.signOut();
+    window.location.reload();
   }
   return (
     <div className={styles.logout_btn}>
       <button onClick={handleLogout}>
-        <RiLogoutBoxRLine size={20}/>
-        <p>{ btnText }</p>
+        <RiLogoutBoxRLine size={20} />
+        <p>{windowWidth > 1080 ? "Logout" : ""}</p>
       </button>
     </div>
   );
 }
 
-export default Login
+export function UserInfo({ userData, windowWidth }) {
+  return (
+    <div className={styles.logout_btn}>
+      <button>
+        <RiUserFollowLine size={20} />
+        <p>{windowWidth > 1080 ? userData.displayName : ""}</p>
+      </button>
+    </div>
+  );
+}
+
+export default Login;
