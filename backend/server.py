@@ -102,7 +102,7 @@ def generate_form():
 
 @app.route("/get_feeds", methods=["GET"])
 def get_feeds():
-    feedList = db.Element.query.filter_by(user_id=session["uid"], state=1).all()
+    feedList = db.Element.query.filter_by(user_id=session["uid"], state=1).order_by(db.Element.id.desc()).all()
     return jsonify({"feedList": [feed.serialize_feed() for feed in feedList]})
 
 
