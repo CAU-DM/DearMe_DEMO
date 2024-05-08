@@ -22,7 +22,7 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated }) {
 
   return (
     <div className={styles.feed_page}>
-      {feeds.lenth === 0 ? <h2>아직 일기가 없어!</h2> : null}
+      {feeds.length === 0 ? <h2>아직 일기가 없어!</h2> : null}
       {feeds.map((feed, index) => (
         <FeedItem
           key={index}
