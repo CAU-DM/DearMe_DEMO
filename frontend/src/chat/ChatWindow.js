@@ -110,7 +110,7 @@ function ChatWindow({ messages, setMessages }) {
       </div>
       <div className={styles.input_area}>
         {
-          messages.length > 18 ? (
+          messages.length > 10 ? (
             <i onClick={handleGenClick}><CiCirclePlus size={32} /></i>
           ) : (
             <i onClick={handleSendClick}></i>
