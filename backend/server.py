@@ -114,4 +114,4 @@ if __name__ == "__main__":
     ]
     ai.system_token = ai.num_tokens_from_messages(conversation_history, model=ai.MODEL)
     ai.encoding = ai.tiktoken.encoding_for_model(ai.MODEL)
-    app.run(debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True)
