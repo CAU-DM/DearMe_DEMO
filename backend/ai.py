@@ -3,6 +3,7 @@ import tiktoken
 import openai
 import os
 import warnings
+
 warnings.filterwarnings("ignore")
 
 generate_added_prompt = """
@@ -70,12 +71,13 @@ You are a doppelgänger of the user. The user should feel as though they are con
 """
 
 # {"gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k-0613", "gpt-4-0314", "gpt-4-32k-0314", "gpt-4-0613", "gpt-4-32k-0613",}
-MODEL="gpt-4-0613"
+MODEL = "gpt-4-0613"
 # conversation_history = [{"role": "system", "content": system_prompt}]
 # system_token = num_tokens_from_messages(conversation_history, model=MODEL)
 # encoding = tiktoken.encoding_for_model(MODEL)
 system_token = 0
 encoding = 0
+
 
 def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613"):
     """Return the number of tokens used by a list of messages."""
@@ -91,17 +93,23 @@ def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613"):
         "gpt-4-32k-0314",
         "gpt-4-0613",
         "gpt-4-32k-0613",
-        }:
+    }:
         tokens_per_message = 3
         tokens_per_name = 1
     elif model == "gpt-3.5-turbo-0301":
-        tokens_per_message = 4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
+        tokens_per_message = (
+            4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
+        )
         tokens_per_name = -1  # if there's a name, the role is omitted
     elif "gpt-3.5-turbo" in model:
-        print("Warning: gpt-3.5-turbo may update over time. Returning num tokens assuming gpt-3.5-turbo-0613.")
+        print(
+            "Warning: gpt-3.5-turbo may update over time. Returning num tokens assuming gpt-3.5-turbo-0613."
+        )
         return num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613")
     elif "gpt-4" in model:
-        print("Warning: gpt-4 may update over time. Returning num tokens assuming gpt-4-0613.")
+        print(
+            "Warning: gpt-4 may update over time. Returning num tokens assuming gpt-4-0613."
+        )
         return num_tokens_from_messages(messages, model="gpt-4-0613")
     else:
         raise NotImplementedError(
@@ -117,45 +125,56 @@ def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613"):
     num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
     return num_tokens
 
-def trim_conversation_history(history, max_tokens=8_192-system_token):
+
+def trim_conversation_history(history, max_tokens=8_192 - system_token):
     total_tokens = num_tokens_from_messages(history, model=MODEL)
     while total_tokens > max_tokens:
         total_tokens -= len(encoding.encode(history.pop(-1)["content"]))
         total_tokens -= 3
     return history
 
+
 def create_openai_client():
     load_dotenv()
-    return openai.OpenAI(api_key=os.getenv('API_KEY'))
+    return openai.OpenAI(api_key=os.getenv("API_KEY"))
+
 
 def generate_chat(client, user_input, conversation_history):
     conversation_history.append({"content": user_input, "role": "user"})
     conversation_history = trim_conversation_history(conversation_history)
-    
+    print(conversation_history)
+
     response = client.chat.completions.create(
-        # model="gpt-3.5-turbo",
-        model=MODEL,
+        model="gpt-3.5-turbo-0613",
+        # model=MODEL,
         messages=conversation_history,
         max_tokens=1000,
-        temperature=0.7
+        temperature=0.7,
     )
-    conversation_history.append({"role": "assistant", "content": response.choices[0].message.content.strip()})
-    
+    conversation_history.append(
+        {"role": "assistant", "content": response.choices[0].message.content.strip()}
+    )
+
     return response.choices[0].message.content.strip()
+
 
 def generate_diary(client, conversation_history):
     conversation_history.pop(0)
-    conversation_history.insert(0, {"role": "system", "content": generate_system_prompt})
+    conversation_history.insert(
+        0, {"role": "system", "content": generate_system_prompt}
+    )
     conversation_history.append({"role": "user", "content": generate_added_prompt})
     conversation_history = trim_conversation_history(conversation_history)
-    
+
     response = client.chat.completions.create(
         # model="gpt-3.5-turbo",
         model=MODEL,
         messages=conversation_history,
         max_tokens=1000,
-        temperature=0.7
+        temperature=0.7,
     )
-    conversation_history.append({"role": "assistant", "content": response.choices[0].message.content.strip()})
+    conversation_history.append(
+        {"role": "assistant", "content": response.choices[0].message.content.strip()}
+    )
     conversation_history[-2]["content"] = "Generate."
     return response.choices[0].message.content.strip()
