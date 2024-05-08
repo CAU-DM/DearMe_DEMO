@@ -42,25 +42,24 @@ def login_success():
         db.Element.query.filter_by(user_id=uid).order_by(db.Element.id.desc()).first()
     )
     if uIdList is None or uIdList.state == 1:
-        tmp = db.Element(
+        tmpElement = db.Element(
             id=nextId,
             user_id=uid,
             feedId=nextId,
             state=0,
             content=json.dumps(conversation_history, ensure_ascii=False),
         )
-        db.db.session.add(tmp)
+        db.db.session.add(tmpElement)
         db.db.session.commit()
-        tmpElement = tmp
         print("New element added")
     else:
         tmpElement = uIdList
-        print("User already exists")
-        print("already content:", tmpElement.content)
+        print("already exist element")
 
-    session["chat"] = session.get("chat", json.loads(tmpElement.content))
-    session["uid"] = session.get("uid", uid)
-    session["nowEleId"] = session.get("nowEleId", tmpElement.id)
+    session["chat"] = json.loads(tmpElement.content)
+    session["uid"] = uid
+    session["nowEleId"] = tmpElement.id
+    print("nowEleId:", session["nowEleId"])
     return jsonify({"messeges": tmpElement.content})
 
 
@@ -91,28 +90,11 @@ def generate_form():
     response_message = ai.generate_diary(client, session["chat"])
     session.modified = True
     tmpElement = db.Element.query.filter_by(id=session["nowEleId"]).first()
-    # print(
-    #     db.Element.query.filter_by(user_id=session["uid"], state=1).count(),
-    #     "before!!! state:",
-    #     tmpElement.state,
-    #     " session[nowEleId]:",
-    #     session["nowEleId"],
-    # )
     tmpElement.content = json.dumps(session["chat"], ensure_ascii=False)
     tmpElement.state = 1
     tmpElement.feed = response_message
     tmpElement.feedTime = datetime.now()
-    try:
-        db.db.session.commit()
-        print("Database committed successfully")
-    except Exception as e:
-        db.db.session.rollback()
-        print("Error during commit:", str(e))
-        # return jsonify({"status": "error", "message": "Database commit failed"}), 500
-    # db.db.session.commit()
-    print(
-        db.Element.query.filter_by(user_id=session["uid"], state=1).count(), "after!!!"
-    )
+    db.db.session.commit()
 
     response_data = {"status": "success", "message": response_message}
     return jsonify(response_data)
