@@ -42,7 +42,8 @@ def generate_form():
 
 if __name__ == '__main__':
     client = ai.create_openai_client()
-    conversation_history = [{"role": "system", "content": ai.dialog_system_prompt}]
-    ai.system_token = ai.num_tokens_from_messages(conversation_history, model=ai.MODEL)
-    ai.encoding = ai.tiktoken.encoding_for_model(ai.MODEL)
-    app.run(debug=True)
+    conversation_history = [
+        {"role": "system", "content": ai.dialog_system_prompt},
+        {"role": "assistant", "content": "안녕? 오늘 하루는 어땠어?"},
+    ]
+    app.run(host="127.0.0.1", port=5000, debug=True)
