@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, session, send_from_directory
-import json
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+import json
 import copy
 import os
 import ai
@@ -34,11 +35,12 @@ def login_success():
     nextId = db.Element.query.count() + 1
     print(f"UID: {uid}, Email: {email}, DisplayName: {displayName}, nextId: {nextId}")
     uIdList = db.Element.query.filter_by(user_id=uid).order_by(db.Element.id.desc()).first()
-    if uIdList is None:
+    if uIdList is None or uIdList.state == 1:
         tmp = db.Element(
             id=nextId,
             user_id=uid,
             feedId=nextId,
+            state=0,
             content=json.dumps(conversation_history, ensure_ascii=False),
         )
         db.db.session.add(tmp)
@@ -87,6 +89,9 @@ def generate_form():
         .first()
     )
     tmpElement.content = json.dumps(session["chat"], ensure_ascii=False)
+    tmpElement.state = 1
+    tmpElement.feed = response_message
+    tmpElement.feedTime = datetime.now()
     db.db.session.commit()
     print("Chat history:", session["chat"])
 
