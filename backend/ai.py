@@ -144,7 +144,7 @@ def create_openai_client():
 
 def generate_chat(client, user_input, conversation_history):
     model = "gpt-3.5-turbo-0613"
-    response_token = 400
+    response_token = 500
     conversation_history.append({"content": user_input, "role": "user"})
     conversation_history = trim_conversation_history(conversation_history, 4_096, model, response_token)
     response = client.chat.completions.create(
