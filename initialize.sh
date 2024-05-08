@@ -1,5 +1,7 @@
 #!/bin/bash
 
+git update-index --assume-unchanged initialize.sh
+
 # 환경 변수 설정
 API_KEY="{FILL}"
 INTERNAL_IP="{FILL}"
