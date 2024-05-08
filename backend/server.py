@@ -56,7 +56,7 @@ def login_success():
     else:
         tmpElement = uIdList
         print("User already exists")
-        print(tmpElement.content)
+        print("already content:", tmpElement.content)
 
     session["chat"] = session.get("chat", json.loads(tmpElement.content))
     session["uid"] = session.get("uid", uid)
@@ -68,7 +68,7 @@ def login_success():
 def submit_form():
     global client
 
-    print("Chat history:", session["chat"], "Message:", request.form["message"])
+    # print("Chat history:", session["chat"], "Message:", request.form["message"])
     response_message = ai.generate_chat(
         client, request.form["message"], session["chat"]
     )
@@ -80,7 +80,7 @@ def submit_form():
     )
     tmpElement.content = json.dumps(session["chat"], ensure_ascii=False)
     db.db.session.commit()
-    print(db.Element.query.order_by(db.Element.id.desc()).first())
+    # print(db.Element.query.order_by(db.Element.id.desc()).first())
     return jsonify({"status": "success", "message": response_message})
 
 
@@ -91,12 +91,28 @@ def generate_form():
     response_message = ai.generate_diary(client, session["chat"])
     session.modified = True
     tmpElement = db.Element.query.filter_by(id=session["nowEleId"]).first()
+    # print(
+    #     db.Element.query.filter_by(user_id=session["uid"], state=1).count(),
+    #     "before!!! state:",
+    #     tmpElement.state,
+    #     " session[nowEleId]:",
+    #     session["nowEleId"],
+    # )
     tmpElement.content = json.dumps(session["chat"], ensure_ascii=False)
     tmpElement.state = 1
     tmpElement.feed = response_message
     tmpElement.feedTime = datetime.now()
-    db.db.session.commit()
-    print(db.Element.query.filter_by(user_id=session["uid"]).count(), "here!!!")
+    try:
+        db.db.session.commit()
+        print("Database committed successfully")
+    except Exception as e:
+        db.db.session.rollback()
+        print("Error during commit:", str(e))
+        # return jsonify({"status": "error", "message": "Database commit failed"}), 500
+    # db.db.session.commit()
+    print(
+        db.Element.query.filter_by(user_id=session["uid"], state=1).count(), "after!!!"
+    )
 
     response_data = {"status": "success", "message": response_message}
     return jsonify(response_data)
