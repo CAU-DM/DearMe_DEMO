@@ -1,16 +1,16 @@
 import React, { useRef, useEffect, useState } from "react";
 import PhotoDrop from "./PhotoDrop";
 import { IoIosSend } from "react-icons/io";
-import { CiCirclePlus } from "react-icons/ci";
+import { CiCirclePlus, CiCloudRainbow } from "react-icons/ci";
 import styles from "./Chat.module.css";
 
-function ChatWindow({ messages, setMessages }) {
+function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
-    chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    chatEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleInputChange = (event) => {
@@ -24,7 +24,7 @@ function ChatWindow({ messages, setMessages }) {
   };
 
   const handleSendClick = () => {
-    if (!isLoading) {
+    if (!isLoading && !isGenerated) {
       let content = inputText.trim();
 
       if (content) {
@@ -54,7 +54,7 @@ function ChatWindow({ messages, setMessages }) {
   };
 
   const handleGenClick = () => {
-    if (!isLoading) {
+    if (!isLoading && !isGenerated) {
       let content = "Generate.";
 
       if (content) {
@@ -62,6 +62,10 @@ function ChatWindow({ messages, setMessages }) {
         setMessages((messages) => [...messages, newMessage]);
         setInputText("");
         setIsLoading(true);
+        setMessages((messages) => [
+          ...messages,
+          { content: "일기를 작성하고 있어!", role: "assistant" },
+        ]);
         fetch("/generate_form", {
           method: "POST",
           headers: {
@@ -71,12 +75,17 @@ function ChatWindow({ messages, setMessages }) {
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("Received response:", data);
+            // console.log("Received response:", data);
             setMessages((messages) => [
               ...messages,
               { content: data.message, role: "assistant" },
+              {
+                content: "일기 생성이 완료되었어! 피드를 확인해봐!",
+                role: "assistant",
+              },
             ]);
             setIsLoading(false);
+            setIsGenerated(true);
           })
           .catch((error) => console.error("Error:", error));
       }
@@ -86,17 +95,22 @@ function ChatWindow({ messages, setMessages }) {
   return (
     <div className={styles.chat_window}>
       <div className={styles.chat_header}>
-        <img src="logo512.png" alt="Profile" className={styles.profile_picture} />
+        <img
+          src="logo512.png"
+          alt="Profile"
+          className={styles.profile_picture}
+        />
         <span className={styles.profile_name}>DearMe</span>
       </div>
       <div className={styles.messages}>
         {messages.map((message, index) => {
           if (message.sender === "photo") {
-            return (
-              <PhotoDrop key={index} />
-            );
+            return <PhotoDrop key={index} />;
           } else {
-            let messageClass = message.role === "user" ? styles.message_user : styles.message_assistant;
+            let messageClass =
+              message.role === "user"
+                ? styles.message_user
+                : styles.message_assistant;
             if (message.role === "user" || message.role === "assistant") {
               return (
                 <div key={index} className={messageClass}>
@@ -109,20 +123,30 @@ function ChatWindow({ messages, setMessages }) {
         <div ref={chatEndRef}></div>
       </div>
       <div className={styles.input_area}>
-        {
-          messages.length > 10 ? (
-            <i onClick={handleGenClick}><CiCirclePlus size={32} /></i>
-          ) : (
-            <i onClick={handleSendClick}></i>
-          )
-        }
-        <input
-          value={inputText}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-          placeholder="Type your message..."
-        />
-        <i onClick={handleSendClick}><IoIosSend size={32} /></i>
+        {!isGenerated ? (
+          <>
+            {messages.length > 10 && !isLoading ? (
+              <i onClick={handleGenClick}>
+                <CiCirclePlus size={32} />
+              </i>
+            ) : (
+              <i onClick={handleSendClick}></i>
+            )}
+            <input
+              value={inputText}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              placeholder="Type your message..."
+            />
+            <i onClick={handleSendClick}>
+              <IoIosSend size={32} />
+            </i>
+          </>
+        ) : (
+          <i onClick={() => window.location.reload()}>
+            <CiCloudRainbow size={32} />
+          </i>
+        )}
       </div>
     </div>
   );
