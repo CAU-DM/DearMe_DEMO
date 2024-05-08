@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import FeedItem from "./FeedItem";
 import styles from "./Feed.module.css";
 
-function FeedPage({ userData, feeds, setFeeds }) {
+function FeedPage({ userData, feeds, setFeeds, isGenerated }) {
   useEffect(() => {
     const fetchFeeds = async () => {
       try {
@@ -17,8 +17,8 @@ function FeedPage({ userData, feeds, setFeeds }) {
         console.error("Error fetching feeds:", error);
       }
     };
-    if (userData !== null) fetchFeeds();
-  }, [userData]);
+    if (userData !== null || isGenerated == true) fetchFeeds();
+  }, [userData, isGenerated]);
 
   return (
     <div className={styles.feed_page}>
