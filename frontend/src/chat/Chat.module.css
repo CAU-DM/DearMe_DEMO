@@ -37,7 +37,7 @@
   align-items: flex-start;
 }
 
-.message_gpt {
+.message_assistant {
   display: inline-flex;
   max-width: 80%;
   padding: 12px 20px;
@@ -51,7 +51,7 @@
   width: fit-content;
 }
 
-.message_me {
+.message_user {
   display: inline-flex;
   max-width: 80%;
   padding: 12px 20px;
