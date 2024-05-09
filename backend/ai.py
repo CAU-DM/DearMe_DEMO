@@ -139,7 +139,7 @@ def trim_conversation_history(history, max_tokens, model, response_token):
 
 def create_openai_client():
     load_dotenv()
-    return openai.OpenAI(api_key=os.getenv("API_KEY"))
+    return openai.OpenAI(api_key=os.getenv("GPT_API_KEY"))
 
 
 def generate_chat(client, user_input, conversation_history):
