@@ -32,14 +32,11 @@ function Login({ setUserData, setMessages }) {
             return response.json();
           })
           .then((data) => {
-            console.log("Success:", data); // 성공적인 결과 처리
             setMessages(JSON.parse(data.messeges));
             return JSON.parse(data.messeges);
           })
           .then((log) => {
-            console.log(log);
             setUserData(user);
-            console.log(user);
           })
           .catch((error) => {
             console.error("Error:", error); // 오류 처리
