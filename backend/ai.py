@@ -72,9 +72,9 @@ You are a doppelgänger of the user. The user should feel as though they are con
 
 gpt3_encoding = tiktoken.encoding_for_model("gpt-3.5-turbo-0613")
 gpt4_encoding = tiktoken.encoding_for_model("gpt-4-0613")
-token_user_gpt3 = len(gpt3_encoding.encode("user")) 
-token_user_gpt4 = len(gpt4_encoding.encode("user")) 
-token_assistant_gpt3 = len(gpt3_encoding.encode("assistant")) 
+token_user_gpt3 = len(gpt3_encoding.encode("user"))
+token_user_gpt4 = len(gpt4_encoding.encode("user"))
+token_assistant_gpt3 = len(gpt3_encoding.encode("assistant"))
 token_assistant_gpt4 = len(gpt4_encoding.encode("assistant"))
 
 
@@ -130,7 +130,7 @@ def trim_conversation_history(history, max_tokens, model, response_token):
     total_tokens = num_tokens_from_messages(history)
     while total_tokens > max_tokens - response_token:
         total_tokens -= len(encoding.encode(history.pop(1)["content"]))
-        total_tokens -= len(encoding.encode(history.pop(1)["content"])) #고의로 두번임
+        total_tokens -= len(encoding.encode(history.pop(1)["content"]))  # 고의로 두번임
         total_tokens -= token_user
         total_tokens -= token_assistant
         total_tokens -= 6
@@ -146,12 +146,14 @@ def generate_chat(client, user_input, conversation_history):
     model = "gpt-3.5-turbo-0613"
     response_token = 500
     conversation_history.append({"content": user_input, "role": "user"})
-    conversation_history = trim_conversation_history(conversation_history, 4_096, model, response_token)
+    conversation_history = trim_conversation_history(
+        conversation_history, 4_096, model, response_token
+    )
     response = client.chat.completions.create(
-        model = model,
-        messages = conversation_history,
-        max_tokens = response_token,
-        temperature = 0.7,
+        model=model,
+        messages=conversation_history,
+        max_tokens=response_token,
+        temperature=0.7,
     )
     conversation_history.append(
         {"role": "assistant", "content": response.choices[0].message.content.strip()}
@@ -161,20 +163,22 @@ def generate_chat(client, user_input, conversation_history):
 
 
 def generate_diary(client, conversation_history):
-    model="gpt-4-0613"
+    model = "gpt-4-0613"
     response_token = 1_500
     conversation_history.pop(0)
     conversation_history.insert(
         0, {"role": "system", "content": generate_system_prompt}
     )
     conversation_history.append({"role": "user", "content": generate_added_prompt})
-    conversation_history = trim_conversation_history(conversation_history, 8_192, model, response_token)
+    conversation_history = trim_conversation_history(
+        conversation_history, 8_192, model, response_token
+    )
 
     response = client.chat.completions.create(
-        model = model,
-        messages = conversation_history,
-        max_tokens = response_token,
-        temperature = 0.7,
+        model=model,
+        messages=conversation_history,
+        max_tokens=response_token,
+        temperature=0.7,
     )
     conversation_history.append(
         {"role": "assistant", "content": response.choices[0].message.content.strip()}
