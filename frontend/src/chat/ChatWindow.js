@@ -100,7 +100,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
           alt="Profile"
           className={styles.profile_picture}
         />
-        <span className={styles.profile_name}>DearMe</span>
+        <span className={styles.profile_name}>Dear Me</span>
       </div>
       <div className={styles.messages}>
         {messages.map((message, index) => {
