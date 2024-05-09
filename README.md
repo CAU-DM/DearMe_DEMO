@@ -20,7 +20,9 @@ Before running the application, you need to configure environment variables. Ope
 
 ```bash
 # Set environment variables
-API_KEY="{FILL}"
+GPT_API_KEY="{FILL}"
+SERVER_INTERNAL_IP="{FILL}"
+SERVER_PORT_NUMBER="{FILL}"
 REACT_APP_APIKEY="{FILL}"
 REACT_APP_AUTHDOMAIN="{FILL}"
 REACT_APP_PROJECTID="{FILL}"
