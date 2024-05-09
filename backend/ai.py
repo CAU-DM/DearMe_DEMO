@@ -70,13 +70,12 @@ You are a doppelgänger of the user. The user should feel as though they are con
 - Korean - 반말(ex. "뭐 했어?", "오늘 기분이 어때?")
 """
 
-# {"gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k-0613", "gpt-4-0314", "gpt-4-32k-0314", "gpt-4-0613", "gpt-4-32k-0613",}
-MODEL = "gpt-4-0613"
-# conversation_history = [{"role": "system", "content": system_prompt}]
-# system_token = num_tokens_from_messages(conversation_history, model=MODEL)
-# encoding = tiktoken.encoding_for_model(MODEL)
-system_token = 0
-encoding = 0
+gpt3_encoding = tiktoken.encoding_for_model("gpt-3.5-turbo-0613")
+gpt4_encoding = tiktoken.encoding_for_model("gpt-4-0613")
+token_user_gpt3 = len(gpt3_encoding.encode("user"))
+token_user_gpt4 = len(gpt4_encoding.encode("user"))
+token_assistant_gpt3 = len(gpt3_encoding.encode("assistant"))
+token_assistant_gpt4 = len(gpt4_encoding.encode("assistant"))
 
 
 def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613"):
@@ -96,21 +95,6 @@ def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613"):
     }:
         tokens_per_message = 3
         tokens_per_name = 1
-    elif model == "gpt-3.5-turbo-0301":
-        tokens_per_message = (
-            4  # every message follows <|start|>{role/name}\n{content}<|end|>\n
-        )
-        tokens_per_name = -1  # if there's a name, the role is omitted
-    elif "gpt-3.5-turbo" in model:
-        print(
-            "Warning: gpt-3.5-turbo may update over time. Returning num tokens assuming gpt-3.5-turbo-0613."
-        )
-        return num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613")
-    elif "gpt-4" in model:
-        print(
-            "Warning: gpt-4 may update over time. Returning num tokens assuming gpt-4-0613."
-        )
-        return num_tokens_from_messages(messages, model="gpt-4-0613")
     else:
         raise NotImplementedError(
             f"""num_tokens_from_messages() is not implemented for model {model}. See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens."""
@@ -126,27 +110,49 @@ def num_tokens_from_messages(messages, model="gpt-3.5-turbo-0613"):
     return num_tokens
 
 
-def trim_conversation_history(history, max_tokens=8_192 - system_token):
-    total_tokens = num_tokens_from_messages(history, model=MODEL)
-    while total_tokens > max_tokens:
-        total_tokens -= len(encoding.encode(history.pop(-1)["content"]))
-        total_tokens -= 3
+def trim_conversation_history(history, max_tokens, model, response_token):
+    global gpt3_encoding
+    global gpt4_encoding
+    global token_user_gpt3
+    global token_user_gpt4
+    global token_assistant_gpt3
+    global token_assistant_gpt4
+
+    if model == "gpt-3.5-turbo-0613":
+        encoding = gpt3_encoding
+        token_user = token_user_gpt3
+        token_assistant = token_assistant_gpt3
+    else:
+        encoding = gpt4_encoding
+        token_user = token_user_gpt4
+        token_assistant = token_assistant_gpt4
+
+    total_tokens = num_tokens_from_messages(history)
+    while total_tokens > max_tokens - response_token:
+        total_tokens -= len(encoding.encode(history.pop(1)["content"]))
+        total_tokens -= len(encoding.encode(history.pop(1)["content"]))  # 고의로 두번임
+        total_tokens -= token_user
+        total_tokens -= token_assistant
+        total_tokens -= 6
     return history
 
 
 def create_openai_client():
     load_dotenv()
-    return openai.OpenAI(api_key=os.getenv("API_KEY"))
+    return openai.OpenAI(api_key=os.getenv("GPT_API_KEY"))
 
 
 def generate_chat(client, user_input, conversation_history):
+    model = "gpt-3.5-turbo-0613"
+    response_token = 500
     conversation_history.append({"content": user_input, "role": "user"})
-    conversation_history = trim_conversation_history(conversation_history)
+    conversation_history = trim_conversation_history(
+        conversation_history, 4_096, model, response_token
+    )
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0613",
-        # model=MODEL,
+        model=model,
         messages=conversation_history,
-        max_tokens=1000,
+        max_tokens=response_token,
         temperature=0.7,
     )
     conversation_history.append(
@@ -157,18 +163,21 @@ def generate_chat(client, user_input, conversation_history):
 
 
 def generate_diary(client, conversation_history):
+    model = "gpt-4-0613"
+    response_token = 1_500
     conversation_history.pop(0)
     conversation_history.insert(
         0, {"role": "system", "content": generate_system_prompt}
     )
     conversation_history.append({"role": "user", "content": generate_added_prompt})
-    conversation_history = trim_conversation_history(conversation_history)
+    conversation_history = trim_conversation_history(
+        conversation_history, 8_192, model, response_token
+    )
 
     response = client.chat.completions.create(
-        # model="gpt-3.5-turbo",
-        model=MODEL,
+        model=model,
         messages=conversation_history,
-        max_tokens=1000,
+        max_tokens=response_token,
         temperature=0.7,
     )
     conversation_history.append(

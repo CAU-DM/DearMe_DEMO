@@ -41,7 +41,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("Received response:", data);
+            // console.log("Received response:", data);
             setMessages((messages) => [
               ...messages,
               { content: data.message, role: "assistant" },
@@ -137,6 +137,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
               onChange={handleInputChange}
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
+              maxLength={300}
             />
             <i onClick={handleSendClick}>
               <IoIosSend size={32} />

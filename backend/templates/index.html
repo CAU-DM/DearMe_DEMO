@@ -88,7 +88,7 @@
 				})
 				.then(response => response.json())
 				.then(data => {
-					console.log('Received response:', data);
+					// console.log('Received response:', data);
 					messages.push({ text: data.message, sender: "gpt" });
 					updateMessages();
 					document.getElementById('submit_button').disabled = false;
