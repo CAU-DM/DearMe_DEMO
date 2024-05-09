@@ -137,6 +137,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
               onChange={handleInputChange}
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
+              maxLength={300}
             />
             <i onClick={handleSendClick}>
               <IoIosSend size={32} />
