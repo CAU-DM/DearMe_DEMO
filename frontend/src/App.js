@@ -31,7 +31,8 @@ function App() {
           />
         </div>
       ) : (
-        <Login setUserData={setUserData} setMessages={setMessages} />
+          // <Login setUserData={setUserData} setMessages={setMessages} />
+          <button onClick={setUserData(1)}>강제 로그인</button>
       )}
     </div>
   );
