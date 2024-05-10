@@ -123,7 +123,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         })}
         <div ref={chatEndRef}></div>
       </div>
-      { messages.length > -1 && !isLoading ? (
+      { messages.length > 10 && !isLoading ? (
           <div className={styles.gen_button_container}>
             <div 
               onClick={() => {
@@ -132,7 +132,6 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
               }}
               key={genButtonKey} 
               className={styles.gen_button}>
-              일기 생성 가능
             </div>
           </div>
         ):(
@@ -156,7 +155,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
           </>
         ) : (
           <i onClick={() => window.location.reload()}>
-            <FaCircleCheck size={32}/>
+            <FaCircleCheck size={32} color="green"/>
           </i>
         )}
       </div>
