@@ -123,7 +123,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         })}
         <div ref={chatEndRef}></div>
       </div>
-      { messages.length > 10 && !isLoading ? (
+      { messages.length > 10 && !isLoading && !isGenerated ? (
           <div className={styles.gen_button_container}>
             <div 
               onClick={() => {
