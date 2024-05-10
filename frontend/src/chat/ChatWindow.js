@@ -1,12 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
 import PhotoDrop from "./PhotoDrop";
 import { IoIosSend } from "react-icons/io";
-import { CiCirclePlus, CiCircleCheck } from "react-icons/ci";
+import { FaCirclePlus, FaCircleCheck } from "react-icons/fa6";
 import styles from "./Chat.module.css";
 
 function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [genButtonKey, setGenButtonKey] = useState(0);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -104,7 +105,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
       </div>
       <div className={styles.messages}>
         {messages.map((message, index) => {
-          if (message.sender === "photo") {
+          if (message.role === "photo") {
             return <PhotoDrop key={index} />;
           } else {
             let messageClass =
@@ -122,16 +123,26 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         })}
         <div ref={chatEndRef}></div>
       </div>
+      { messages.length > -1 && !isLoading ? (
+          <div className={styles.gen_button_container}>
+            <div 
+              onClick={() => {
+                handleGenClick();
+                setGenButtonKey((prevKey) => prevKey + 1);
+              }}
+              key={genButtonKey} 
+              className={styles.gen_button}>
+              일기 생성 가능
+            </div>
+          </div>
+        ):(
+          <></>
+        )
+         
+      }
       <div className={styles.input_area}>
         {!isGenerated ? (
           <>
-            {messages.length > 10 && !isLoading ? (
-              <i onClick={handleGenClick}>
-                <CiCirclePlus size={32} />
-              </i>
-            ) : (
-              <i onClick={handleSendClick}></i>
-            )}
             <input
               value={inputText}
               onChange={handleInputChange}
@@ -145,7 +156,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
           </>
         ) : (
           <i onClick={() => window.location.reload()}>
-            <CiCircleCheck size={32} />
+            <FaCircleCheck size={32}/>
           </i>
         )}
       </div>
