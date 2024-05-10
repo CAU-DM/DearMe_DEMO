@@ -23,6 +23,7 @@ Before running the application, you need to configure environment variables. Ope
 GPT_API_KEY="{FILL}"
 SERVER_INTERNAL_IP="{FILL}"
 SERVER_PORT_NUMBER="{FILL}"
+export SERVER_SQLITE_WEB_PASSWORD="{FILL}"
 REACT_APP_APIKEY="{FILL}"
 REACT_APP_AUTHDOMAIN="{FILL}"
 REACT_APP_PROJECTID="{FILL}"
@@ -33,10 +34,16 @@ REACT_APP_MEASUREMENTID="{FILL}"
 ```
 and then
 ```bash
-chmod +x initialize.sh && bash initialize.sh
+chmod +x initialize.sh && source initialize.sh
 ``` 
 
-### 3. Start the Server
+### 3. Build the Server
+
+```bash
+chmod +x build_server.sh && bash build_server.sh
+```
+
+### 4. Start the Server and DB Admin Page on Background
 
 ```bash
 chmod +x start_server.sh && bash start_server.sh
