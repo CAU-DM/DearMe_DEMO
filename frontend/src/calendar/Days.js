@@ -5,7 +5,7 @@ function Days() {
     for (let i = 0; i < 7; i++) {
         days.push(
             <div
-                className={`flex flex-col ${
+                className={`flex flex-col w-12 items-center ${
                     date[i] === 'Sun'
                         ? 'text-rose-400'
                         : date[i] === 'Sat'
@@ -20,7 +20,7 @@ function Days() {
     }
 
     return (
-        <div className="flex flex-row w-full h-16 p-4 justify-between items-center">
+        <div className="flex flex-row w-full h-16 justify-around items-center">
             {days}
         </div>
     );

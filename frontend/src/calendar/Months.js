@@ -19,7 +19,7 @@ function Months({ currentMonth, prevMonth, nextMonth }) {
     };
 
     return (
-        <div className="flex w-full h-1/4 flex-row p-10 justify-between items-center">
+        <div className="flex w-full h-1/5 flex-row p-10 justify-between items-center">
             <div onClick={prevMonth}>
                 <FaAngleLeft />
             </div>

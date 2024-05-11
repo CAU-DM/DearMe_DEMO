@@ -1,5 +1,5 @@
-import React, { useEffec, useState } from 'react';
-import { format, addMonths, subMonths } from 'date-fns';
+import React, { useState } from 'react';
+import { addMonths, subMonths } from 'date-fns';
 import '../tailwind.css';
 import Months from './Months';
 import Days from './Days';
@@ -22,13 +22,13 @@ function CalendarPage(userData, feed, setFeeds, isGenerated) {
     };
 
     return (
-        <div className="flex w-full h-full max-w-[630px] flex-col p-16 justify-center items-center gap-8">
+        <div className="flex w-full h-full max-w-[630px] flex-col p-16 justify-between items-center gap-4">
             <Months
                 currentMonth={currentMonth}
                 prevMonth={prevMonth}
                 nextMonth={nextMonth}
             />
-            <div className="flex w-full h-full flex-col pb-16">
+            <div className="flex w-full h-full flex-col justify-between items-center gap-4 pb-5">
                 <Days />
                 <Cells
                     currentMonth={currentMonth}

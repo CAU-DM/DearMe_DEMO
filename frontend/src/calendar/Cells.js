@@ -32,10 +32,10 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
                         !isSameMonth(day, monthStart)
                             ? ''
                             : isSameDay(day, selectedDate)
-                            ? 'bg-rose-300'
+                            ? 'bg-rose-300 hover:bg-slate-300'
                             : format(currentMonth, 'M') !== format(day, 'M')
-                            ? 'text-slate-500'
-                            : 'hover:bg-slate-200'
+                            ? ''
+                            : 'hover:border-1 hover:bg-slate-300'
                     }`}
                     key={day}
                     onClick={() => onDateClick(parse(cloneDay))}
