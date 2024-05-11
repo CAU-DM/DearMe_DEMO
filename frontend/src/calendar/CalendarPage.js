@@ -1,23 +1,42 @@
-import React, { useState } from 'react';
-import Calendar from 'react-calendar';
-import moment from 'moment';
-import './Calendar.css';
+import React, { useEffec, useState } from 'react';
+import { format, addMonths, subMonths } from 'date-fns';
+import '../tailwind.css';
+import Months from './Months';
+import Days from './Days';
+import Cells from './Cells';
 
-function CalendarPage() {
-    const [value, onChange] = useState(new Date()); // 초기값은 현재 날짜
+function CalendarPage(userData, feed, setFeeds, isGenerated) {
+    const [currentMonth, setCurrentMonth] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(new Date());
+
+    const prevMonth = () => {
+        setCurrentMonth(subMonths(currentMonth, 1));
+    };
+
+    const nextMonth = () => {
+        setCurrentMonth(addMonths(currentMonth, 1));
+    };
+
+    const onDateClick = (day) => {
+        setSelectedDate(day);
+    };
 
     return (
-        <Calendar
-            onChange={onChange}
-            value={value}
-            formatDay={(locale, date) => moment(date).format('D')} // 일 제거 숫자만 보이게
-            formatYear={(locale, date) => moment(date).format('YYYY')}
-            formatMonthYear={(locale, date) => moment(date).format('YYYY. MM')}
-            next2Label={null}
-            prev2Label={null}
-            minDetail="year"
-            calendarType="gregory"
-        />
+        <div className="flex w-full h-full flex-col p-16 justify-center items-center">
+            <Months
+                currentMonth={currentMonth}
+                prevMonth={prevMonth}
+                nextMonth={nextMonth}
+            />
+            <div className="flex w-full h-full flex-col pb-24">
+                <Days />
+                <Cells
+                    currentMonth={currentMonth}
+                    selectedDate={selectedDate}
+                    onDateClick={onDateClick}
+                />
+            </div>
+        </div>
     );
 }
 
