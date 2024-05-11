@@ -28,14 +28,14 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
             const cloneDay = day;
             days.push(
                 <div
-                    className={`flex flex-col w-full h-full ${
+                    className={`flex flex-col w-16 h-16 rounded-full ${
                         !isSameMonth(day, monthStart)
                             ? ''
                             : isSameDay(day, selectedDate)
-                            ? 'bg-red-300'
+                            ? 'bg-rose-300'
                             : format(currentMonth, 'M') !== format(day, 'M')
                             ? 'text-slate-500'
-                            : 'hover:bg-slate-500'
+                            : 'hover:bg-slate-200'
                     }`}
                     key={day}
                     onClick={() => onDateClick(parse(cloneDay))}
@@ -43,7 +43,7 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
                     <span
                         className={
                             format(currentMonth, 'M') !== format(day, 'M')
-                                ? 'flex w-full h-full justify-center items-center text-slate-500'
+                                ? 'flex w-full h-full justify-center items-center text-slate-400'
                                 : 'flex w-full h-full justify-center items-center'
                         }
                     >
@@ -55,7 +55,7 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
         }
         rows.push(
             <div
-                className="flex flex-row w-full h-full items-start justify-between"
+                className="flex flex-row w-full h-full items-start justify-between gap-1"
                 key={day}
             >
                 {days}
@@ -64,7 +64,7 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
         days = [];
     }
     return (
-        <div className="flex flex-col w-full h-full items-center justify-between">
+        <div className="flex flex-col w-full h-full items-center justify-between gap-1">
             {rows}
         </div>
     );

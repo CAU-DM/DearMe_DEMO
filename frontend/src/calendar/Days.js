@@ -4,7 +4,16 @@ function Days() {
 
     for (let i = 0; i < 7; i++) {
         days.push(
-            <div className="flex flex-col" key={i}>
+            <div
+                className={`flex flex-col ${
+                    date[i] === 'Sun'
+                        ? 'text-rose-400'
+                        : date[i] === 'Sat'
+                        ? 'text-indigo-400'
+                        : ''
+                }`}
+                key={i}
+            >
                 {date[i]}
             </div>
         );

@@ -22,13 +22,13 @@ function CalendarPage(userData, feed, setFeeds, isGenerated) {
     };
 
     return (
-        <div className="flex w-full h-full flex-col p-16 justify-center items-center">
+        <div className="flex w-full h-full max-w-[630px] flex-col p-16 justify-center items-center gap-8">
             <Months
                 currentMonth={currentMonth}
                 prevMonth={prevMonth}
                 nextMonth={nextMonth}
             />
-            <div className="flex w-full h-full flex-col pb-24">
+            <div className="flex w-full h-full flex-col pb-16">
                 <Days />
                 <Cells
                     currentMonth={currentMonth}
