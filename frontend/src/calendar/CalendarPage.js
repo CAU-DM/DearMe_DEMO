@@ -22,7 +22,7 @@ function CalendarPage(userData, feed, setFeeds, isGenerated) {
     };
 
     return (
-        <div className="flex w-full h-full max-w-[630px] flex-col p-16 justify-between items-center gap-4">
+        <div className="flex w-full h-full max-w-[630px] flex-col p-16 justify-between items-center gap-4 overflow-y-auto overflow-x-hidden shadow-[0_0_10px_rgba(0,0,0,0.1)]">
             <Months
                 currentMonth={currentMonth}
                 prevMonth={prevMonth}
