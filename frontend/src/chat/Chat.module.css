@@ -205,3 +205,10 @@
     scale: 1.1;
   }
 }
+
+.date_text {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

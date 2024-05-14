@@ -9,10 +9,17 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const [isLoading, setIsLoading] = useState(false);
   const [genButtonKey, setGenButtonKey] = useState(0);
   const chatEndRef = useRef(null);
+  const today = new Date();
 
   useEffect(() => {
     chatEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const formattedDate = today.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   const handleInputChange = (event) => {
     setInputText(event.target.value);
@@ -103,6 +110,15 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         />
         <span className={styles.profile_name}>Dear Me</span>
       </div>
+      {
+        messages.length > -1 && !isLoading && !isGenerated ? (
+          <div className={styles.date_text}>
+            <> { formattedDate }</>
+          </div>
+        ):(
+          <></>
+        )
+      }
       <div className={styles.messages}>
         {messages.map((message, index) => {
           if (message.role === "photo") {
