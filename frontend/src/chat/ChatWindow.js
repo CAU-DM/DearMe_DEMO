@@ -33,7 +33,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !event.nativeEvent.isComposing) {
       handleSendClick();
     }
   };
