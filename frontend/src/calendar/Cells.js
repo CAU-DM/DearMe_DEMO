@@ -38,7 +38,8 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
                             : 'hover:border-1 hover:bg-slate-300'
                     }`}
                     key={day}
-                    onClick={() => onDateClick(parse(cloneDay))}
+                    onClick={() => onDateClick(format(cloneDay, 'yyyy-MM-dd'))}
+                    // onClick={() => console.log(parse(cloneDay))}
                 >
                     <span
                         className={

@@ -4,8 +4,9 @@ import '../tailwind.css';
 import Months from './Months';
 import Days from './Days';
 import Cells from './Cells';
+import FeedPage from '../feed/FeedPage';
 
-function CalendarPage(userData, feed, setFeeds, isGenerated) {
+function CalendarPage({ userData, setIsCalendar, setFeedDate }) {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -19,6 +20,8 @@ function CalendarPage(userData, feed, setFeeds, isGenerated) {
 
     const onDateClick = (day) => {
         setSelectedDate(day);
+        setIsCalendar(false);
+        setFeedDate(day);
     };
 
     return (

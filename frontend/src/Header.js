@@ -3,8 +3,9 @@ import { LogoutButton, UserInfo } from './login/Login';
 import CalendarPage from './calendar/CalendarPage';
 import CalendarButton from './calendar/CalendarButton';
 import FeedButton from './calendar/FeedButton';
+import { format } from 'date-fns';
 
-function Header({ userData, isCalendar, setIsCalendar }) {
+function Header({ userData, isCalendar, setIsCalendar, setFeedDate }) {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     useEffect(() => {
@@ -21,14 +22,23 @@ function Header({ userData, isCalendar, setIsCalendar }) {
 
     const imageUrl = windowWidth > 1080 ? 'logo_text_c.png' : 'logo512_nb.png';
 
+    const gotoHome = () => {
+        setFeedDate(format(new Date(), 'yyyy-MM-dd'));
+        setIsCalendar(false);
+    };
+
     return (
         <div className="header">
-            <img src={imageUrl} alt="Logo" />
+            <img
+                src={imageUrl}
+                alt="Logo"
+                onClick={() => setFeedDate(format(new Date(), 'yyyy-MM-dd'))}
+            />
             {userData ? (
                 <div className="buttons">
                     <div>
                         {isCalendar === true ? (
-                            <button onClick={() => setIsCalendar(false)}>
+                            <button onClick={gotoHome}>
                                 <FeedButton />
                             </button>
                         ) : (

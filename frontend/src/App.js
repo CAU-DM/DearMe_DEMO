@@ -6,6 +6,7 @@ import Header from './Header';
 import PhotoDrop from './chat/PhotoDrop';
 import './App.css';
 import CalendarPage from './calendar/CalendarPage';
+import { format } from 'date-fns';
 
 function App() {
     const [userData, setUserData] = useState(null);
@@ -13,10 +14,7 @@ function App() {
     const [feeds, setFeeds] = useState([]);
     const [isGenerated, setIsGenerated] = useState(false);
     const [isCalendar, setIsCalendar] = useState(false);
-
-    useEffect(() => {
-        console.log(isCalendar);
-    });
+    const [feedDate, setFeedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
     return (
         <div className="App">
@@ -24,15 +22,15 @@ function App() {
                 userData={userData}
                 isCalendar={isCalendar}
                 setIsCalendar={setIsCalendar}
+                setFeedDate={setFeedDate}
             />
             {userData ? (
                 <div className="main_container">
                     {isCalendar ? (
                         <CalendarPage
                             userData={userData}
-                            feeds={feeds}
-                            setFeeds={setFeeds}
-                            isGenerated={isGenerated}
+                            setIsCalendar={setIsCalendar}
+                            setFeedDate={setFeedDate}
                         />
                     ) : (
                         <FeedPage
@@ -40,6 +38,7 @@ function App() {
                             feeds={feeds}
                             setFeeds={setFeeds}
                             isGenerated={isGenerated}
+                            feedDate={feedDate}
                         />
                     )}
                     <ChatWindow
