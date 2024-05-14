@@ -9,11 +9,18 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const [isLoading, setIsLoading] = useState(false);
   const [genButtonKey, setGenButtonKey] = useState(0);
   const chatEndRef = useRef(null);
+  const inputRef = useRef(null);
   const today = new Date();
 
   useEffect(() => {
     chatEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.scrollLeft = inputRef.current.scrollWidth;
+    }
+  }, [inputText]);
 
   const formattedDate = today.toLocaleDateString('ko-KR', {
     year: 'numeric',
@@ -25,7 +32,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
     setInputText(event.target.value);
   };
 
-  const handleKeyPress = (event) => {
+  const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       handleSendClick();
     }
@@ -159,9 +166,10 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         {!isGenerated ? (
           <>
             <input
+              ref = {inputRef}
               value={inputText}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
+              onInput={handleInputChange}
+              onKeyDown={handleKeyDown}
               placeholder="Type your message..."
               maxLength={300}
             />
