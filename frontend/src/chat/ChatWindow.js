@@ -13,7 +13,9 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const today = new Date();
 
   useEffect(() => {
-    chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -44,7 +46,16 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
 
       if (content) {
         const newMessage = { content: content, role: "user" };
-        setMessages((messages) => [...messages, newMessage]);
+        setMessages((messages) => {
+          const updatedMessages = [...messages, newMessage];
+          // 메시지가 추가된 후에 자동 스크롤
+          setTimeout(() => {
+            if (chatEndRef.current) {
+              chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+            }
+          }, 0);
+          return updatedMessages;
+        });
         setInputText("");
         setIsLoading(true);
         fetch("/submit_form", {
