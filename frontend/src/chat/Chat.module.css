@@ -206,9 +206,16 @@
   }
 }
 
-.date_text {
+.date_container {
   width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  padding-bottom: 4px;
+}
+
+.date_container p {
+  font-weight: 600;
+  font-size: small;
+  color: #999;
+  margin-top: 1px;
 }

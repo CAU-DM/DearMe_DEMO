@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import PhotoDrop from "./PhotoDrop";
 import { IoIosSend } from "react-icons/io";
-import { FaCirclePlus, FaCircleCheck } from "react-icons/fa6";
+import { FaCircleCheck } from "react-icons/fa6";
 import styles from "./Chat.module.css";
 
 function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
@@ -110,16 +110,16 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         />
         <span className={styles.profile_name}>Dear Me</span>
       </div>
+      <div className={styles.messages}>
       {
-        messages.length > -1 && !isLoading && !isGenerated ? (
-          <div className={styles.date_text}>
-            <> { formattedDate }</>
+        messages.length > -1 && !isGenerated ? (
+          <div className={styles.date_container}>
+            <p> { formattedDate }</p>
           </div>
         ):(
           <></>
         )
       }
-      <div className={styles.messages}>
         {messages.map((message, index) => {
           if (message.role === "photo") {
             return <PhotoDrop key={index} />;
