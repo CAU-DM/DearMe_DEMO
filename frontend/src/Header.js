@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { LogoutButton, UserInfo } from "./login/Login";
+import { GiStrawberry } from "react-icons/gi";
 
 function Header({ userData }) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -16,6 +17,8 @@ function Header({ userData }) {
     };
   }, []);
 
+
+
   const imageUrl = windowWidth > 1080 ? "logo_text_c.png" : "logo512_nb.png";
 
   return (
@@ -24,9 +27,22 @@ function Header({ userData }) {
       {userData ? (
         <div>
           <UserInfo userData={userData} windowWidth={windowWidth} />
+          <div className="about_btn">
+            <button>
+              <GiStrawberry size={20} />
+              <p>{windowWidth > 1080 ? "About Us" : ""}</p>
+            </button>
+          </div>
           <LogoutButton userData={userData} windowWidth={windowWidth} />
         </div>
-      ) : null}
+      ) : (
+        <div className="about_btn">
+          <button>
+            <GiStrawberry size={20} />
+            <p>{windowWidth > 1080 ? "About Us" : ""}</p>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

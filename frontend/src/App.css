@@ -29,6 +29,33 @@ body, html {
   margin-left: 24px;
 }
 
+.about_btn {
+  width: 100%;
+  height: 50px;
+  margin-bottom: 10px;
+  display: flex;
+  align-content: center;
+  color: #757575;
+}
+
+.about_btn button {
+  margin-left: 15px;
+  border: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+  color: #eeeeee;
+  background-color: transparent;
+  &:hover {
+    color: #999;
+  }
+}
+
+.about_btn p {
+  margin-left: 15px;
+}
+
 .login-window {
   height: 100%;
   width: 100%;
@@ -98,6 +125,12 @@ body, html {
   .header img {
     margin-top: 0px;
     margin-left: 10px;
+  }
+
+  .header div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
   }
 }
 
