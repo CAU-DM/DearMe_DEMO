@@ -34,11 +34,13 @@ function Header({ userData, setModalIsOpen}) {
           <LogoutButton userData={userData} windowWidth={windowWidth} />
         </div>
       ) : (
-        <div className="about_btn">
-          <button onClick={() => setModalIsOpen(true)}>
-            <GiStrawberry size={20} />
-            <p>{windowWidth > 1080 ? "About Us" : ""}</p>
-          </button>
+        <div>
+          <div className="about_btn">
+            <button onClick={() => setModalIsOpen(true)}>
+              <GiStrawberry size={20} />
+              <p>{windowWidth > 1080 ? "About Us" : ""}</p>
+            </button>
+          </div>
         </div>
       )}
     </div>
