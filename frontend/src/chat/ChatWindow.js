@@ -48,7 +48,6 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         const newMessage = { content: content, role: "user" };
         setMessages((messages) => {
           const updatedMessages = [...messages, newMessage];
-          // 메시지가 추가된 후에 자동 스크롤
           setTimeout(() => {
             if (chatEndRef.current) {
               chatEndRef.current.scrollIntoView({ behavior: "smooth" });
