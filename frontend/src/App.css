@@ -56,6 +56,54 @@ body, html {
   margin-left: 15px;
 }
 
+.ReactModal__Overlay {
+  background-color: rgba(0, 0, 0, 0.75);
+  width: 100vw;
+  height: 100vh;
+}
+
+.ReactModal__Content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: white;
+  outline: none;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+}
+
+.modal-content img {
+  width: 100%;
+  max-width: 50vw;
+  height: auto;
+}
+
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  &:hover {
+    color: #22232c;
+  }
+}
+
 .login-window {
   height: 100%;
   width: 100%;
@@ -138,7 +186,6 @@ body, html {
   .header {
     min-width: 64px;
   }
-
   
   .header img {
     margin-left: 16px;
@@ -148,6 +195,10 @@ body, html {
 @media (min-width: 1921px) {
   .header {
     min-width: 324px;
+  }
+
+  .ReactModal__Content {
+    transform: translate(-10%, -50%);
   }
 }
 
