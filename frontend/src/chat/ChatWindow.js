@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import PhotoDrop from "./PhotoDrop";
 import { IoIosSend } from "react-icons/io";
-import { FaCirclePlus, FaCircleCheck } from "react-icons/fa6";
+import { FaCircleCheck } from "react-icons/fa6";
 import styles from "./Chat.module.css";
 
 function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
@@ -9,17 +9,33 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const [isLoading, setIsLoading] = useState(false);
   const [genButtonKey, setGenButtonKey] = useState(0);
   const chatEndRef = useRef(null);
+  const inputRef = useRef(null);
+  const today = new Date();
 
   useEffect(() => {
-    chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.scrollLeft = inputRef.current.scrollWidth;
+    }
+  }, [inputText]);
+
+  const formattedDate = today.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   const handleInputChange = (event) => {
     setInputText(event.target.value);
   };
 
-  const handleKeyPress = (event) => {
-    if (event.key === "Enter") {
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && !event.nativeEvent.isComposing) {
       handleSendClick();
     }
   };
@@ -30,7 +46,15 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
 
       if (content) {
         const newMessage = { content: content, role: "user" };
-        setMessages((messages) => [...messages, newMessage]);
+        setMessages((messages) => {
+          const updatedMessages = [...messages, newMessage];
+          setTimeout(() => {
+            if (chatEndRef.current) {
+              chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+            }
+          }, 0);
+          return updatedMessages;
+        });
         setInputText("");
         setIsLoading(true);
         fetch("/submit_form", {
@@ -104,6 +128,15 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         <span className={styles.profile_name}>Dear Me</span>
       </div>
       <div className={styles.messages}>
+      {
+        messages.length > -1 && !isGenerated ? (
+          <div className={styles.date_container}>
+            <p> { formattedDate }</p>
+          </div>
+        ):(
+          <></>
+        )
+      }
         {messages.map((message, index) => {
           if (message.role === "photo") {
             return <PhotoDrop key={index} />;
@@ -143,9 +176,10 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         {!isGenerated ? (
           <>
             <input
+              ref = {inputRef}
               value={inputText}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
+              onInput={handleInputChange}
+              onKeyDown={handleKeyDown}
               placeholder="Type your message..."
               maxLength={300}
             />

@@ -20,10 +20,18 @@ function FeedItem({ date, image, content }) {
     content = editedContent;
   };
 
+  const feedDate = new Date(date);
+
+  const formattedDate = feedDate.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   return (
     <div className={styles.feed_item}>
       <div className={ styles.feed_item_header }>
-        <div className={styles.date_text}>{date}</div>
+        <div className={styles.date_text}>{formattedDate}의 일기</div>
           {isEditing ? (
             <button onClick={handleSave} className={styles.save_button}>
               <BiCheck size={26}/>
