@@ -23,7 +23,7 @@ Before running the application, you need to configure environment variables. Ope
 GPT_API_KEY="{FILL}"
 SERVER_INTERNAL_IP="{FILL}"
 SERVER_PORT_NUMBER="{FILL}"
-export SERVER_SQLITE_WEB_PASSWORD="{FILL}"
+export SQLITE_WEB_PASSWORD="{FILL}"
 REACT_APP_APIKEY="{FILL}"
 REACT_APP_AUTHDOMAIN="{FILL}"
 REACT_APP_PROJECTID="{FILL}"

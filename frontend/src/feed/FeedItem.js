@@ -20,32 +20,41 @@ function FeedItem({ date, image, content }) {
         content = editedContent;
     };
 
-    return (
-        <div className={styles.feed_item}>
-            <div className={styles.feed_item_header}>
-                <div className={styles.date_text}>{date}</div>
-                {isEditing ? (
-                    <button onClick={handleSave} className={styles.save_button}>
-                        <BiCheck size={26} />
-                    </button>
-                ) : (
-                    <button onClick={handleEdit} className={styles.edit_button}>
-                        <BiEditAlt size={22} />
-                    </button>
-                )}
-            </div>
-            <img src={image} alt="Feed" />
-            {isEditing ? (
-                <textarea
-                    value={editedContent}
-                    onChange={handleInputChange}
-                    className={styles.textarea}
-                />
-            ) : (
-                <p className={styles.content}>{content}</p>
-            )}
-        </div>
-    );
+  const feedDate = new Date(date);
+
+  const formattedDate = feedDate.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  return (
+    <div className={styles.feed_item}>
+      <div className={ styles.feed_item_header }>
+        <div className={styles.date_text}>{formattedDate}의 일기</div>
+          {isEditing ? (
+            <button onClick={handleSave} className={styles.save_button}>
+              <BiCheck size={26}/>
+            </button>
+          ) : (
+            <button onClick={handleEdit} className={styles.edit_button}>
+              <BiEditAlt size={22}/>
+            </button>
+          )}
+      </div>
+      <img src={image} alt="Feed" />
+      {isEditing ? (
+        <textarea
+          value={editedContent}
+          onChange={handleInputChange}
+          className={styles.textarea}
+        />
+      ) : (
+        <p className={styles.content}>{content}</p>
+      )}
+    </div>
+  );
+
 }
 
 export default FeedItem;

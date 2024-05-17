@@ -4,8 +4,15 @@ import CalendarPage from './calendar/CalendarPage';
 import CalendarButton from './calendar/CalendarButton';
 import FeedButton from './calendar/FeedButton';
 import { format } from 'date-fns';
+import { GiStrawberry } from 'react-icons/gi';
 
-function Header({ userData, isCalendar, setIsCalendar, setFeedDate }) {
+function Header({
+    userData,
+    isCalendar,
+    setIsCalendar,
+    setFeedDate,
+    setModalIsOpen,
+}) {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     useEffect(() => {
@@ -52,13 +59,28 @@ function Header({ userData, isCalendar, setIsCalendar, setFeedDate }) {
                             userData={userData}
                             windowWidth={windowWidth}
                         />
+                        <div className="about_btn">
+                            <button onClick={() => setModalIsOpen(true)}>
+                                <GiStrawberry size={20} />
+                                <p>{windowWidth > 1080 ? 'About Us' : ''}</p>
+                            </button>
+                        </div>
                         <LogoutButton
                             userData={userData}
                             windowWidth={windowWidth}
                         />
                     </div>
                 </div>
-            ) : null}
+            ) : (
+                <div>
+                    <div className="about_btn">
+                        <button onClick={() => setModalIsOpen(true)}>
+                            <GiStrawberry size={20} />
+                            <p>{windowWidth > 1080 ? 'About Us' : ''}</p>
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

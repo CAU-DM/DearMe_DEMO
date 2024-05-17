@@ -4,38 +4,41 @@ import styles from './Feed.module.css';
 import { parse } from 'date-fns';
 
 function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
-    useEffect(() => {
-        const fetchFeeds = async () => {
-            try {
-                const response = await fetch('/get_feeds', {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                const data = await response.json();
-                // console.log("Feed List:", data.feedList);
-                setFeeds(data.feedList);
-            } catch (error) {
-                console.error('Error fetching feeds:', error);
-            }
-        };
-        if (userData !== null || isGenerated == true) fetchFeeds();
-    }, [userData, isGenerated]);
+  const randomIndex = Math.floor(Math.random() * 4);
+  const imgUrl = "/img/empty_" + randomIndex + ".png";
 
-    return (
-        <div className={styles.feed_page}>
-            <div>{feedDate}</div>
-            {feeds.length === 0 ? <h2> 아직 일기가 없어!</h2> : null}
-            {feeds.map((feed, index) => (
-                <FeedItem
-                    key={index}
-                    date={feed.feedTime}
-                    // image={feed.image_url}
-                    image={'/img/cheon.png'}
-                    content={feed.feed}
-                />
-            ))}
-        </div>
-    );
+  useEffect(() => {
+    const fetchFeeds = async () => {
+      try {
+        const response = await fetch("/get_feeds", {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await response.json();
+        // console.log("Feed List:", data.feedList);
+        setFeeds(data.feedList);
+      } catch (error) {
+        console.error("Error fetching feeds:", error);
+      }
+    };
+    if (userData !== null || isGenerated == true) fetchFeeds();
+  }, [userData, isGenerated]);
+
+  return (
+    <div className={styles.feed_page}>
+      <div>{feedDate}</div>
+      {feeds.length === 0 ? <img src={imgUrl} alt="아직 일기가 없어요!" width={300} style={{ marginTop: '200px' }}/> : null}
+      {feeds.map((feed, index) => (
+        <FeedItem
+          key={index}
+          date={feed.feedTime}
+          // image={feed.image_url}
+          image={"/img/cheon.png"}
+          content={feed.feed}
+        />
+      ))}
+    </div>
+  );
 }
 
 export default FeedPage;
