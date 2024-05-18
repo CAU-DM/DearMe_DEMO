@@ -1,50 +1,88 @@
-import React, { useState, useEffect } from "react";
-import { LogoutButton, UserInfo } from "./login/Login";
-import { GiStrawberry } from "react-icons/gi";
+import React, { useState, useEffect } from 'react';
+import { LogoutButton, UserInfo } from './login/Login';
+import CalendarPage from './calendar/CalendarPage';
+import CalendarButton from './calendar/CalendarButton';
+import FeedButton from './calendar/FeedButton';
+import { format } from 'date-fns';
+import { GiStrawberry } from 'react-icons/gi';
 
-function Header({ userData, setModalIsOpen}) {
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+function Header({
+    userData,
+    isCalendar,
+    setIsCalendar,
+    setFeedDate,
+    setModalIsOpen,
+}) {
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    const imageUrl = windowWidth > 1080 ? 'logo_text_c.png' : 'logo512_nb.png';
+
+    const gotoHome = () => {
+        setFeedDate(format(new Date(), 'yyyy-MM-dd'));
+        setIsCalendar(false);
     };
 
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  const imageUrl = windowWidth > 1080 ? "logo_text_c.png" : "logo512_nb.png";
-
-  return (
-    <div className="header">
-      <img src={imageUrl} alt="Logo" />
-      {userData ? (
-        <div>
-          <UserInfo userData={userData} windowWidth={windowWidth} />
-          <div className="about_btn">
-            <button onClick={() => setModalIsOpen(true)}>
-              <GiStrawberry size={20} />
-              <p>{windowWidth > 1080 ? "About Us" : ""}</p>
-            </button>
-          </div>
-          <LogoutButton userData={userData} windowWidth={windowWidth} />
+    return (
+        <div className="header">
+            <img
+                src={imageUrl}
+                alt="Logo"
+                onClick={() => setFeedDate(format(new Date(), 'yyyy-MM-dd'))}
+            />
+            {userData ? (
+                <div className="buttons">
+                    <div>
+                        {isCalendar === true ? (
+                            <button onClick={gotoHome}>
+                                <FeedButton />
+                            </button>
+                        ) : (
+                            <button onClick={() => setIsCalendar(true)}>
+                                <CalendarButton />
+                            </button>
+                        )}
+                    </div>
+                    <div>
+                        <UserInfo
+                            userData={userData}
+                            windowWidth={windowWidth}
+                        />
+                        <div className="about_btn">
+                            <button onClick={() => setModalIsOpen(true)}>
+                                <GiStrawberry size={20} />
+                                <p>{windowWidth > 1080 ? 'About Us' : ''}</p>
+                            </button>
+                        </div>
+                        <LogoutButton
+                            userData={userData}
+                            windowWidth={windowWidth}
+                        />
+                    </div>
+                </div>
+            ) : (
+                <div>
+                    <div className="about_btn">
+                        <button onClick={() => setModalIsOpen(true)}>
+                            <GiStrawberry size={20} />
+                            <p>{windowWidth > 1080 ? 'About Us' : ''}</p>
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
-      ) : (
-        <div>
-          <div className="about_btn">
-            <button onClick={() => setModalIsOpen(true)}>
-              <GiStrawberry size={20} />
-              <p>{windowWidth > 1080 ? "About Us" : ""}</p>
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    );
 }
 
 export default Header;

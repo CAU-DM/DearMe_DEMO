@@ -1,24 +1,24 @@
 import { useState } from 'react';
 import styles from './Feed.module.css';
-import { BiCheck } from "react-icons/bi";
-import { BiEditAlt } from "react-icons/bi";
+import { BiCheck } from 'react-icons/bi';
+import { BiEditAlt } from 'react-icons/bi';
 
 function FeedItem({ date, image, content }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedContent, setEditedContent] = useState(content);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedContent, setEditedContent] = useState(content);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
+    const handleEdit = () => {
+        setIsEditing(true);
+    };
 
-  const handleSave = () => {
-    setIsEditing(false);
-  };
+    const handleSave = () => {
+        setIsEditing(false);
+    };
 
-  const handleInputChange = (e) => {
-    setEditedContent(e.target.value);
-    content = editedContent;
-  };
+    const handleInputChange = (e) => {
+        setEditedContent(e.target.value);
+        content = editedContent;
+    };
 
   const feedDate = new Date(date);
 
@@ -54,6 +54,7 @@ function FeedItem({ date, image, content }) {
       )}
     </div>
   );
+
 }
 
 export default FeedItem;

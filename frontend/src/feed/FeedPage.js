@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
-import FeedItem from "./FeedItem";
-import styles from "./Feed.module.css";
+import React, { useEffect } from 'react';
+import FeedItem from './FeedItem';
+import styles from './Feed.module.css';
+import { parse } from 'date-fns';
 
-function FeedPage({ userData, feeds, setFeeds, isGenerated }) {
+function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
   const randomIndex = Math.floor(Math.random() * 4);
   const imgUrl = "/img/empty_" + randomIndex + ".png";
 
@@ -25,6 +26,7 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated }) {
 
   return (
     <div className={styles.feed_page}>
+      <div>{feedDate}</div>
       {feeds.length === 0 ? <img src={imgUrl} alt="아직 일기가 없어요!" width={300} style={{ marginTop: '200px' }}/> : null}
       {feeds.map((feed, index) => (
         <FeedItem
