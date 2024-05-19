@@ -113,7 +113,7 @@ def submit_message():
     messege_list = chat.Messages
     user_message = db.Message(
         ChatId=session["ChatId"],
-        Message = request.get_json()['message'],
+        Message=request.get_json()["message"],
         Sender=db.SenderEnum.user,
     )
     messege_list_for_ai = [msg.serialize_for_ai() for msg in messege_list]
@@ -146,20 +146,36 @@ def submit_message():
 @app.route("/generate_message", methods=["POST"])
 def generate_message():
     global client
+    request_messages = request.get_json()["message"]
 
     chat = db.Chat.query.filter_by(ChatId=session["ChatId"]).first()
     messege_list_for_ai = [msg.serialize_for_ai() for msg in chat.Messages]
     response_message = db.Message(
         ChatId=session["ChatId"],
-        Message=ai.generate_chat(client, messege_list_for_ai),
+        Message=ai.generate_diary(client, messege_list_for_ai),
         Sender=db.SenderEnum.assistant,
     )
-    db.db.session.add(
-        db.Message(
-            ChatId=session["ChatId"], Sender=db.SenderEnum.user, Content="Generate."
-        )
+    print("일기:", response_message.Message)
+    db.db.session.add_all(
+        [
+            db.Message(
+                ChatId=session["ChatId"],
+                Sender=db.SenderEnum.user,
+                Message=request_messages[0],
+            ),
+            db.Message(
+                ChatId=session["ChatId"],
+                Sender=db.SenderEnum.assistant,
+                Message=request_messages[1],
+            ),
+            response_message,
+            db.Message(
+                ChatId=session["ChatId"],
+                Sender=db.SenderEnum.assistant,
+                Message=request_messages[2],
+            ),
+        ]
     )
-    db.db.session.add(response_message)
     db.db.session.commit()
 
     return jsonify({"status": "success", "message": response_message.serialize()})
