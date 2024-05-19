@@ -69,6 +69,7 @@ def get_messages():
             ChatId=chat.ChatId,
             Sender=db.SenderEnum.assistant,
             Message="안녕? 오늘 하루는 어땠어?",
+            Time=datetime.now().time(),
         )
         db.db.session.add(default_message)
         db.db.session.commit()
@@ -115,6 +116,7 @@ def submit_message():
         ChatId=session["ChatId"],
         Message=request.get_json()["message"],
         Sender=db.SenderEnum.user,
+        Time=datetime.now().time(),
     )
     messege_list_for_ai = [msg.serialize_for_ai() for msg in messege_list]
     messege_list_for_ai.append(user_message.serialize_for_ai())
@@ -123,6 +125,7 @@ def submit_message():
         ChatId=session["ChatId"],
         Message=ai.generate_chat(client, messege_list_for_ai),
         Sender=db.SenderEnum.assistant,
+        Time=datetime.now().time(),
     )
     db.db.session.add(user_message)
     db.db.session.add(response_message)
@@ -154,6 +157,7 @@ def generate_message():
         ChatId=session["ChatId"],
         Message=ai.generate_diary(client, messege_list_for_ai),
         Sender=db.SenderEnum.assistant,
+        Time=datetime.now().time(),
     )
     print("일기:", response_message.Message)
     db.db.session.add_all(
@@ -162,17 +166,20 @@ def generate_message():
                 ChatId=session["ChatId"],
                 Sender=db.SenderEnum.user,
                 Message=request_messages[0],
+                Time=datetime.now().time(),
             ),
             db.Message(
                 ChatId=session["ChatId"],
                 Sender=db.SenderEnum.assistant,
                 Message=request_messages[1],
+                Time=datetime.now().time(),
             ),
             response_message,
             db.Message(
                 ChatId=session["ChatId"],
                 Sender=db.SenderEnum.assistant,
                 Message=request_messages[2],
+                Time=datetime.now().time(),
             ),
         ]
     )
