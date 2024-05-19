@@ -31,13 +31,13 @@ def index():
 @app.route("/login_success", methods=["POST"])
 def login_success():
     user_raw_data = request.json
-    user = db.User.query.filter_by(UId=user_raw_data["UId"]).first()
+    user = db.User.query.filter_by(UId=user_raw_data["uid"]).first()
     if user is None:
         user = db.User(
-            UId=user_raw_data["UId"],
-            Name=user_raw_data["displayName"],
+            UId=user_raw_data["uid"],
+            UName=user_raw_data["displayName"],
             Email=user_raw_data["email"],
-            persona=None,
+            Persona=None,
         )
         db.db.session.add(user)
         db.db.session.commit()
@@ -50,19 +50,26 @@ def login_success():
 
 @app.route("/get_messages", methods=["GET"])
 def get_messages():
+    global client
+
+    if "UId" not in session:
+        return jsonify({"status": "error", "message": "User not logged in."})
+
     chat = (
         db.Chat.query.filter_by(UId=session["UId"])
         .order_by(db.Chat.Date.desc())
         .first()
     )
-    if chat is None or not chat.Diarie:
+    if chat is None or chat.Diary:
         chat = db.Chat(UId=session["UId"])
+        db.db.session.add(chat)
+        db.db.session.flush()
+        print("here", chat.ChatId)
         default_message = db.Message(
             ChatId=chat.ChatId,
-            Sender=db.SenderEnum.ASSISTANT,
-            Content="안녕? 오늘 하루는 어땠어?",
+            Sender=db.SenderEnum.assistant,
+            Message="안녕? 오늘 하루는 어땠어?",
         )
-        db.db.session.add(chat)
         db.db.session.add(default_message)
         db.db.session.commit()
     session["ChatId"] = chat.ChatId
@@ -99,19 +106,23 @@ def get_messages():
 def submit_message():
     global client
 
+    if "UId" not in session:
+        return jsonify({"status": "error", "message": "User not logged in."})
+
     chat = db.Chat.query.filter_by(ChatId=session["ChatId"]).first()
     messege_list = chat.Messages
     user_message = db.Message(
         ChatId=session["ChatId"],
-        Message=request.json["messege"],
-        Sender=db.SenderEnum.USER,
+        Message = request.get_json()['message'],
+        Sender=db.SenderEnum.user,
     )
     messege_list_for_ai = [msg.serialize_for_ai() for msg in messege_list]
     messege_list_for_ai.append(user_message.serialize_for_ai())
+    print(messege_list_for_ai)
     response_message = db.Message(
         ChatId=session["ChatId"],
         Message=ai.generate_chat(client, messege_list_for_ai),
-        Sender=db.SenderEnum.ASSISTANT,
+        Sender=db.SenderEnum.assistant,
     )
     db.db.session.add(user_message)
     db.db.session.add(response_message)
@@ -141,11 +152,11 @@ def generate_message():
     response_message = db.Message(
         ChatId=session["ChatId"],
         Message=ai.generate_chat(client, messege_list_for_ai),
-        Sender=db.SenderEnum.ASSISTANT,
+        Sender=db.SenderEnum.assistant,
     )
     db.db.session.add(
         db.Message(
-            ChatId=session["ChatId"], Sender=db.SenderEnum.USER, Content="Generate."
+            ChatId=session["ChatId"], Sender=db.SenderEnum.user, Content="Generate."
         )
     )
     db.db.session.add(response_message)
