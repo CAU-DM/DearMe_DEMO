@@ -63,7 +63,7 @@ class Message(db.Model):
     ChatId = db.Column(db.Integer, db.ForeignKey("chat.ChatId"), nullable=False)
     Message = db.Column(db.Text, nullable=False)
     Sender = db.Column(db.Enum(SenderEnum), nullable=False)
-    Time = db.Column(db.Time, default=datetime.now().time, nullable=False)
+    Time = db.Column(db.Time, default=datetime.now().time(), nullable=False)
 
     def serialize(self):
         return {
@@ -71,7 +71,7 @@ class Message(db.Model):
             "ChatId": self.ChatId,
             "content": self.Message,
             "role": self.Sender.name,
-            # "Time": self.Time,
+            "time": self.Time.strftime("%H:%M:%S"),
         }
 
     def serialize_for_ai(self):
