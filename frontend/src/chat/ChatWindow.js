@@ -13,6 +13,23 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const today = new Date();
 
   useEffect(() => {
+    fetch('/get_messages', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        if (!response.ok)
+          throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then((data) => {
+        setMessages(data.messages);
+      })
+  }, []);
+
+  useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -57,20 +74,22 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         });
         setInputText("");
         setIsLoading(true);
-        fetch("/submit_form", {
+        fetch("/submit_message", {
           method: "POST",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/json",
           },
-          body: `user=testUser&message=${encodeURIComponent(content)}`,
+          body: JSON.stringify({ message: content }),
         })
           .then((response) => response.json())
           .then((data) => {
-            // console.log("Received response:", data);
-            setMessages((messages) => [
-              ...messages,
-              { content: data.message, role: "assistant" },
-            ]);
+            console.log("Received response:", data);
+            if (data.status === "success") {
+              setMessages((messages) => [
+                ...messages,
+                { content: data.message.content, role: data.message.role },
+              ]);
+            }
             setIsLoading(false);
           })
           .catch((error) => console.error("Error:", error));
@@ -91,12 +110,12 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
           ...messages,
           { content: "일기를 작성하고 있어!", role: "assistant" },
         ]);
-        fetch("/generate_form", {
+        fetch("/generate_message", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: `user=testUser&message=${encodeURIComponent(content)}`,
+          body: `message=${encodeURIComponent(content)}`,
         })
           .then((response) => response.json())
           .then((data) => {
@@ -128,15 +147,15 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         <span className={styles.profile_name}>Dear Me</span>
       </div>
       <div className={styles.messages}>
-      {
-        messages.length > -1 && !isGenerated ? (
-          <div className={styles.date_container}>
-            <p> { formattedDate }</p>
-          </div>
-        ):(
-          <></>
-        )
-      }
+        {
+          messages.length > 0 && !isGenerated ? (
+            <div className={styles.date_container}>
+              <p> {formattedDate}</p>
+            </div>
+          ) : (
+            <></>
+          )
+        }
         {messages.map((message, index) => {
           if (message.role === "photo") {
             return <PhotoDrop key={index} />;
@@ -156,27 +175,27 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         })}
         <div ref={chatEndRef}></div>
       </div>
-      { messages.length > 10 && !isLoading && !isGenerated ? (
-          <div className={styles.gen_button_container}>
-            <div 
-              onClick={() => {
-                handleGenClick();
-                setGenButtonKey((prevKey) => prevKey + 1);
-              }}
-              key={genButtonKey} 
-              className={styles.gen_button}>
-            </div>
+      {messages.length > 10 && !isLoading && !isGenerated ? (
+        <div className={styles.gen_button_container}>
+          <div
+            onClick={() => {
+              handleGenClick();
+              setGenButtonKey((prevKey) => prevKey + 1);
+            }}
+            key={genButtonKey}
+            className={styles.gen_button}>
           </div>
-        ):(
-          <></>
-        )
-         
+        </div>
+      ) : (
+        <></>
+      )
+
       }
       <div className={styles.input_area}>
         {!isGenerated ? (
           <>
             <input
-              ref = {inputRef}
+              ref={inputRef}
               value={inputText}
               onInput={handleInputChange}
               onKeyDown={handleKeyDown}
@@ -189,7 +208,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
           </>
         ) : (
           <i onClick={() => window.location.reload()}>
-            <FaCircleCheck size={32} color="green"/>
+            <FaCircleCheck size={32} color="green" />
           </i>
         )}
       </div>
