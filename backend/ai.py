@@ -142,15 +142,15 @@ def create_openai_client():
     return openai.OpenAI(api_key=os.getenv("GPT_API_KEY"))
 
 
-def generate_chat(client, messages_for_ai):
+def generate_chat(client, conversation_history):
     model = "gpt-3.5-turbo-0613"
     response_token = 500
-    messages_for_ai = trim_conversation_history(
-        messages_for_ai, 4_096, model, response_token
+    conversation_history = trim_conversation_history(
+        conversation_history, 4_096, model, response_token
     )
     response = client.chat.completions.create(
         model=model,
-        messages=messages_for_ai,
+        messages=conversation_history,
         max_tokens=response_token,
         temperature=0.7,
     )
@@ -162,9 +162,9 @@ def generate_diary(client, conversation_history):
     response_token = 1_500
     conversation_history.pop(0)
     conversation_history.insert(
-        0, {"role": "system", "content": generate_system_prompt}
+        0, {"role": "SYSTEM", "content": generate_system_prompt}
     )
-    conversation_history.append({"role": "user", "content": generate_added_prompt})
+    conversation_history.append({"role": "USER", "content": generate_added_prompt})
     conversation_history = trim_conversation_history(
         conversation_history, 8_192, model, response_token
     )
@@ -175,8 +175,4 @@ def generate_diary(client, conversation_history):
         max_tokens=response_token,
         temperature=0.7,
     )
-    conversation_history.append(
-        {"role": "assistant", "content": response.choices[0].message.content.strip()}
-    )
-    conversation_history[-2]["content"] = "Generate."
     return response.choices[0].message.content.strip()
