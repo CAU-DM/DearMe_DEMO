@@ -4,6 +4,16 @@ import { IoIosSend } from "react-icons/io";
 import { FaCircleCheck } from "react-icons/fa6";
 import styles from "./Chat.module.css";
 
+function getTimeString() {
+  const now = new Date();
+
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+
+  return `${hours}:${minutes}:${seconds}`;
+}
+
 function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +43,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
+    console.log(messages);
   }, [messages]);
 
   useEffect(() => {
@@ -62,7 +73,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
       let content = inputText.trim();
 
       if (content) {
-        const newMessage = { content: content, role: "user" };
+        const newMessage = { content: content, role: "user", time: getTimeString() };
         setMessages((messages) => {
           const updatedMessages = [...messages, newMessage];
           setTimeout(() => {
@@ -83,11 +94,10 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("Received response:", data);
             if (data.status === "success") {
               setMessages((messages) => [
                 ...messages,
-                { content: data.message.content, role: data.message.role },
+                { content: data.message.content, role: data.message.role, time: getTimeString() },
               ]);
             }
             setIsLoading(false);
@@ -99,35 +109,41 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
 
   const handleGenClick = () => {
     if (!isLoading && !isGenerated) {
-      let content = "Generate.";
+      let content = ["Generate.", "일기를 작성하고 있어!", "일기 생성이 완료되었어! 피드를 확인해봐!"];
 
       if (content) {
-        const newMessage = { content: content, role: "user" };
+        const newMessage = { content: content[0], role: "user", time: getTimeString() };
         setMessages((messages) => [...messages, newMessage]);
         setInputText("");
         setIsLoading(true);
         setMessages((messages) => [
           ...messages,
-          { content: "일기를 작성하고 있어!", role: "assistant" },
+          {
+            content: content[1],
+            role: "assistant",
+            time: getTimeString()
+          },
         ]);
         fetch("/generate_message", {
           method: "POST",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/json",
           },
-          body: `message=${encodeURIComponent(content)}`,
+          body: JSON.stringify({ message: content }),
         })
           .then((response) => response.json())
           .then((data) => {
-            // console.log("Received response:", data);
-            setMessages((messages) => [
-              ...messages,
-              { content: data.message, role: "assistant" },
-              {
-                content: "일기 생성이 완료되었어! 피드를 확인해봐!",
-                role: "assistant",
-              },
-            ]);
+            if (data.status === "success") {
+              setMessages((messages) => [
+                ...messages,
+                { content: data.message.content, role: data.message.role, time: getTimeString() },
+                {
+                  content: content[2],
+                  role: "assistant",
+                  time: getTimeString()
+                },
+              ]);
+            }
             setIsLoading(false);
             setIsGenerated(true);
           })
@@ -168,6 +184,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
               return (
                 <div key={index} className={messageClass}>
                   {message.content}
+                  {message.time}
                 </div>
               );
             }
@@ -175,7 +192,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         })}
         <div ref={chatEndRef}></div>
       </div>
-      {messages.length > 10 && !isLoading && !isGenerated ? (
+      {messages.length > 4 && !isLoading && !isGenerated ? (
         <div className={styles.gen_button_container}>
           <div
             onClick={() => {
