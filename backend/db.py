@@ -91,3 +91,12 @@ class Diary(db.Model):
     UpdatedAt = db.Column(
         db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False
     )
+
+    def serialize(self):
+        return {
+            "id": self.DiaryId,
+            "content": self.Content,
+            "created_at": self.CreatedAt,
+            "updated_at": self.UpdatedAt,
+            "img_url": self.ImgURL,
+        }
