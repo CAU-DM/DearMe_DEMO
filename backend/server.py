@@ -31,10 +31,10 @@ def index():
 @app.route("/login_success", methods=["POST"])
 def login_success():
     user_raw_data = request.json
-    user = db.User.query.filter_by(UId=user_raw_data["uid"]).first()
+    user = db.User.query.filter_by(UId=user_raw_data["UId"]).first()
     if user is None:
         user = db.User(
-            UId=user_raw_data["uid"],
+            UId=user_raw_data["UId"],
             Name=user_raw_data["displayName"],
             Email=user_raw_data["email"],
             persona=None,
@@ -43,19 +43,20 @@ def login_success():
         db.db.session.commit()
         print(f"New user added: {user.UId}")
     print(f"UID: {user.UId}, Email: {user.Email}, DisplayName: {user.UName}")
-    session["uid"] = user.UId
+    session["UId"] = user.UId
+    session.modified = True
     return jsonify({"status": "success"})
 
 
-@app.route("/get_chat_list", methods=["GET"])
-def get_chat_list():
+@app.route("/get_messages", methods=["GET"])
+def get_messages():
     chat = (
-        db.Chat.query.filter_by(UId=session["uid"])
+        db.Chat.query.filter_by(UId=session["UId"])
         .order_by(db.Chat.Date.desc())
         .first()
     )
-    if chat is None or chat.Done == True:
-        chat = db.Chat(UId=session["uid"])
+    if chat is None or not chat.Diarie:
+        chat = db.Chat(UId=session["UId"])
         default_message = db.Message(
             ChatId=chat.ChatId,
             Sender=db.SenderEnum.ASSISTANT,
@@ -64,7 +65,9 @@ def get_chat_list():
         db.db.session.add(chat)
         db.db.session.add(default_message)
         db.db.session.commit()
-    session["chat"] = chat.ChatId
+    session["ChatId"] = chat.ChatId
+    session.modified = True
+    return jsonify({"messages": [msg.serialize() for msg in chat.Messages]})
 
     # uIdList = (
     #     db.Element.query.filter_by(user_id=user.UId).order_by(db.Element.id.desc()).first()
@@ -84,41 +87,57 @@ def get_chat_list():
     #     tmpElement = uIdList
     #     print("already exist element")
 
-    # session["chat"] = json.loads(tmpElement.content)
+    # session["ChatId"] = json.loads(tmpElement.content)
     # session["nowEleId"] = tmpElement.id
     # print("nowEleId:", session["nowEleId"])
-    # return jsonify({"messeges": tmpElement.content})
+    # return jsonify({"messages": tmpElement.content})
 
 
-@app.route("/submit_form", methods=["POST"])
-def submit_form():
+@app.route("/submit_message", methods=["POST"])
+def submit_message():
     global client
 
-    # print("here")
-    # print("Chat history:", session["chat"], "Message:", request.form["message"])
-    response_message = ai.generate_chat(
-        client, request.form["message"], session["chat"]
+    chat = db.Chat.query.filter_by(ChatId=session["ChatId"]).first()
+    messege_list = chat.Messages
+    user_message = db.Message(
+        ChatId=session["ChatId"],
+        Message=request.json["messege"],
+        Sender=db.SenderEnum.USER,
     )
-    session.modified = True
-    tmpElement = (
-        db.Element.query.filter_by(user_id=session["uid"])
-        .order_by(db.Element.id.desc())
-        .first()
+    messege_list_for_ai = [msg.serialize_for_ai() for msg in messege_list]
+    messege_list_for_ai.append(user_message.serialize_for_ai())
+    response_message = db.Message(
+        ChatId=session["ChatId"],
+        Message=ai.generate_chat(client, messege_list_for_ai),
+        Sender=db.SenderEnum.ASSISTANT,
     )
-    tmpElement.content = json.dumps(session["chat"], ensure_ascii=False)
+    db.db.session.add(user_message)
+    db.db.session.add(response_message)
     db.db.session.commit()
-    # print(db.Element.query.order_by(db.Element.id.desc()).first())
-    return jsonify({"status": "success", "message": response_message})
+    return jsonify({"status": "success", "message": response_message.serialize()})
+    # response_message = ai.generate_chat(
+    #     client, request.form["message"], session["ChatId"]
+    # )
+    # session.modified = True
+    # tmpElement = (
+    #     db.Element.query.filter_by(user_id=session["UId"])
+    #     .order_by(db.Element.id.desc())
+    #     .first()
+    # )
+    # tmpElement.content = json.dumps(session["ChatId"], ensure_ascii=False)
+    # db.db.session.commit()
+    # # print(db.Element.query.order_by(db.Element.id.desc()).first())
+    # return jsonify({"status": "success", "message": response_message})
 
 
-@app.route("/generate_form", methods=["POST"])
-def generate_form():
+@app.route("/generate_message", methods=["POST"])
+def generate_message():
     global client
 
-    response_message = ai.generate_diary(client, session["chat"])
+    response_message = ai.generate_diary(client, session["ChatId"])
     session.modified = True
     tmpElement = db.Element.query.filter_by(id=session["nowEleId"]).first()
-    tmpElement.content = json.dumps(session["chat"], ensure_ascii=False)
+    tmpElement.content = json.dumps(session["ChatId"], ensure_ascii=False)
     tmpElement.state = 1
     tmpElement.feed = response_message
     tmpElement.feedTime = datetime.now()
@@ -131,7 +150,7 @@ def generate_form():
 @app.route("/get_feeds", methods=["GET"])
 def get_feeds():
     feedList = (
-        db.Element.query.filter_by(user_id=session["uid"], state=1)
+        db.Element.query.filter_by(user_id=session["UId"], state=1)
         .order_by(db.Element.id.desc())
         .all()
     )
