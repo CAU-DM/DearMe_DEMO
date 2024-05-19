@@ -15,7 +15,7 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
           credentials: "include",
         });
         const data = await response.json();
-        // console.log("Feed List:", data.feedList);
+        console.log("Feed List:", data.feedList);
         setFeeds(data.feedList);
       } catch (error) {
         console.error("Error fetching feeds:", error);
@@ -28,13 +28,12 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
     <div className={styles.feed_page}>
       <div>{feedDate}</div>
       {feeds.length === 0 ? <img src={imgUrl} alt="아직 일기가 없어요!" width={300} style={{ marginTop: '200px' }}/> : null}
-      {feeds.map((feed, index) => (
+      {feeds.map((feed) => (
         <FeedItem
-          key={index}
-          date={feed.feedTime}
-          // image={feed.image_url}
-          image={"/img/cheon.png"}
-          content={feed.feed}
+          key={feed.id}
+          content={feed.content}
+          date={feed.created_at}
+          image={feed.img_url}
         />
       ))}
     </div>
