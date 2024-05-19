@@ -32,14 +32,14 @@ from enum import Enum
 
 
 class SenderEnum(Enum):
-    USER = 0
-    ASSISTANT = 1
-    SYSTEM = 2
+    user = 0
+    assistant = 1
+    system = 2
 
 
 class User(db.Model):
     __tablename__ = "user"
-    UId = db.Column(db.Integer, primary_key=True)
+    UId = db.Column(db.String, primary_key=True)
     UName = db.Column(db.String, nullable=False)
     Email = db.Column(db.String, nullable=False)
     Persona = db.Column(db.Text, nullable=True)
@@ -54,7 +54,7 @@ class Chat(db.Model):
     Date = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
     Messages = db.relationship("Message", backref="chat", lazy=True)
-    Diariy = db.relationship("Diary", backref="chat", lazy=True)
+    Diary = db.relationship("Diary", backref="chat", lazy=True)
 
 
 class Message(db.Model):
@@ -69,14 +69,14 @@ class Message(db.Model):
         return {
             "MessageId": self.MessageId,
             "ChatId": self.ChatId,
-            "Message": self.Message,
-            "Sender": self.Sender.name,
-            "Time": self.Time,
+            "content": self.Message,
+            "role": self.Sender.name,
+            # "Time": self.Time,
         }
 
     def serialize_for_ai(self):
         return {
-            "sender": self.Sender.name,
+            "role": self.Sender.name,
             "content": self.Message,
         }
 
