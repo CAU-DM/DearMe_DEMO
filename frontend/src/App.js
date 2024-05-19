@@ -54,8 +54,8 @@ function App() {
                     />
                 </div>
             ) : (
-                // <Login setUserData={setUserData} setMessages={setMessages} />
-                <button onClick={setUserData(1)}>강제 로그인</button>
+                <Login setUserData={setUserData} />
+                // <button onClick={setUserData(1)}>강제 로그인</button>
             )}
             <Modal
         isOpen={modalIsOpen}
