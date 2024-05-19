@@ -28,48 +28,66 @@ def index():
     return send_from_directory(app.static_folder, "index.html")
 
 
-def sign_in(user_data):
-    user = db.User.query.filter_by(UId=user_data["uid"]).first()
+@app.route("/login_success", methods=["POST"])
+def login_success():
+    user_raw_data = request.json
+    user = db.User.query.filter_by(UId=user_raw_data["uid"]).first()
     if user is None:
         user = db.User(
-            UId=user_data["uid"],
-            Name=user_data["displayName"],
-            Email=user_data["email"],
+            UId=user_raw_data["uid"],
+            Name=user_raw_data["displayName"],
+            Email=user_raw_data["email"],
             persona=None,
         )
         db.db.session.add(user)
         db.db.session.commit()
+        print(f"New user added: {user.UId}")
     print(f"UID: {user.UId}, Email: {user.Email}, DisplayName: {user.UName}")
-    return user
+    session["uid"] = user.UId
+    return jsonify({"status": "success"})
 
 
-@app.route("/login-success", methods=["POST"])
-def login_success():
-    user = sign_in(request.json)
-
-    uIdList = (
-        db.Element.query.filter_by(user_id=user.UId).order_by(db.Element.id.desc()).first()
+@app.route("/get_chat_list", methods=["GET"])
+def get_chat_list():
+    chat = (
+        db.Chat.query.filter_by(UId=session["uid"])
+        .order_by(db.Chat.Date.desc())
+        .first()
     )
-    if uIdList is None or uIdList.state == 1:
-        tmpElement = db.Element(
-            id=nextId,
-            user_id=uid,
-            feedId=nextId,
-            state=0,
-            content=json.dumps(conversation_history, ensure_ascii=False),
+    if chat is None or chat.Done == True:
+        chat = db.Chat(UId=session["uid"])
+        default_message = db.Message(
+            ChatId=chat.ChatId,
+            Sender=db.SenderEnum.ASSISTANT,
+            Content="안녕? 오늘 하루는 어땠어?",
         )
-        db.db.session.add(tmpElement)
+        db.db.session.add(chat)
+        db.db.session.add(default_message)
         db.db.session.commit()
-        print("New element added")
-    else:
-        tmpElement = uIdList
-        print("already exist element")
+    session["chat"] = chat.ChatId
 
-    session["chat"] = json.loads(tmpElement.content)
-    session["uid"] = uid
-    session["nowEleId"] = tmpElement.id
-    print("nowEleId:", session["nowEleId"])
-    return jsonify({"messeges": tmpElement.content})
+    # uIdList = (
+    #     db.Element.query.filter_by(user_id=user.UId).order_by(db.Element.id.desc()).first()
+    # )
+    # if uIdList is None or uIdList.state == 1:
+    #     tmpElement = db.Element(
+    #         id=nextId,
+    #         user_id=uid,
+    #         feedId=nextId,
+    #         state=0,
+    #         content=json.dumps(conversation_history, ensure_ascii=False),
+    #     )
+    #     db.db.session.add(tmpElement)
+    #     db.db.session.commit()
+    #     print("New element added")
+    # else:
+    #     tmpElement = uIdList
+    #     print("already exist element")
+
+    # session["chat"] = json.loads(tmpElement.content)
+    # session["nowEleId"] = tmpElement.id
+    # print("nowEleId:", session["nowEleId"])
+    # return jsonify({"messeges": tmpElement.content})
 
 
 @app.route("/submit_form", methods=["POST"])
