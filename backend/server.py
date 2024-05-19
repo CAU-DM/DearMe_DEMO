@@ -15,7 +15,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.db.init_app(app)
     with app.app_context():
-        # db.db.drop_all()
+        db.db.drop_all()
         db.db.create_all()
     return app
 
@@ -25,21 +25,30 @@ app = create_app()
 
 @app.route("/")
 def index():
-    session.pop("chat", None)
     return send_from_directory(app.static_folder, "index.html")
+
+
+def sign_in(user_data):
+    user = db.User.query.filter_by(UId=user_data["uid"]).first()
+    if user is None:
+        user = db.User(
+            UId=user_data["uid"],
+            Name=user_data["displayName"],
+            Email=user_data["email"],
+            persona=None,
+        )
+        db.db.session.add(user)
+        db.db.session.commit()
+    print(f"UID: {user.UId}, Email: {user.Email}, DisplayName: {user.UName}")
+    return user
 
 
 @app.route("/login-success", methods=["POST"])
 def login_success():
-    user_data = request.json
-    uid = user_data["uid"]
-    email = user_data["email"]
-    displayName = user_data["displayName"]
+    user = sign_in(request.json)
 
-    nextId = db.Element.query.count() + 1
-    print(f"UID: {uid}, Email: {email}, DisplayName: {displayName}, nextId: {nextId}")
     uIdList = (
-        db.Element.query.filter_by(user_id=uid).order_by(db.Element.id.desc()).first()
+        db.Element.query.filter_by(user_id=user.UId).order_by(db.Element.id.desc()).first()
     )
     if uIdList is None or uIdList.state == 1:
         tmpElement = db.Element(
@@ -67,6 +76,7 @@ def login_success():
 def submit_form():
     global client
 
+    # print("here")
     # print("Chat history:", session["chat"], "Message:", request.form["message"])
     response_message = ai.generate_chat(
         client, request.form["message"], session["chat"]
