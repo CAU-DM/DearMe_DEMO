@@ -115,6 +115,9 @@ def generate_message():
     global client
     request_messages = request.get_json()["message"]
 
+    if "UId" not in session:
+        return jsonify({"status": "error", "message": "User not logged in."})
+
     chat = db.Chat.query.filter_by(ChatId=session["ChatId"]).first()
     messege_list_for_ai = [msg.serialize_for_ai() for msg in chat.Messages]
     response_message = db.Message(
@@ -123,7 +126,6 @@ def generate_message():
         Sender=db.SenderEnum.assistant,
         Time=datetime.now().time(),
     )
-    print("일기:", response_message.Message)
     db.db.session.add_all(
         [
             db.Message(
@@ -147,27 +149,33 @@ def generate_message():
             ),
         ]
     )
-    db.db.session.commit()
 
+    new_diary = db.Diary(
+        ChatId=session["ChatId"],
+        Content=response_message.Message,
+        ImgURL="../frontend/public/img/cheon.png",
+    )
+    db.db.session.add(new_diary)
+
+    db.db.session.commit()
     return jsonify({"status": "success", "message": response_message.serialize()})
 
 
 @app.route("/get_feeds", methods=["GET"])
 def get_feeds():
-    feedList = (
-        db.Element.query.filter_by(user_id=session["UId"], state=1)
-        .order_by(db.Element.id.desc())
-        .all()
-    )
-    return jsonify({"feedList": [feed.serialize_feed() for feed in feedList]})
+    if "UId" not in session:
+        return jsonify({"status": "error", "message": "User not logged in."})
+
+    user = db.User.query.filter_by(UId=session["UId"]).first()
+    chatList = user.Chats
+    diaryList = [chat.Diary for chat in chatList if chat.Diary is not None]
+    print(diaryList)
+
+    return jsonify({"feedList": [diary[0].serialize() for diary in diaryList]})
 
 
 if __name__ == "__main__":
     client = ai.create_openai_client()
-    conversation_history = [
-        {"role": "system", "content": ai.dialog_system_prompt},
-        {"role": "assistant", "content": "안녕? 오늘 하루는 어땠어?"},
-    ]
     app.run(
         host=os.getenv("SERVER_INTERNAL_IP"),
         port=int(os.getenv("SERVER_PORT_NUMBER")),
