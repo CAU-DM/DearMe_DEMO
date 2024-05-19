@@ -54,7 +54,7 @@ class Chat(db.Model):
     Date = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
     Messages = db.relationship("Message", backref="chat", lazy=True)
-    Diaries = db.relationship("Diary", backref="chat", lazy=True)
+    Diariy = db.relationship("Diary", backref="chat", lazy=True)
 
 
 class Message(db.Model):
@@ -64,6 +64,21 @@ class Message(db.Model):
     Message = db.Column(db.Text, nullable=False)
     Sender = db.Column(db.Enum(SenderEnum), nullable=False)
     Time = db.Column(db.Time, default=datetime.now().time, nullable=False)
+
+    def serialize(self):
+        return {
+            "MessageId": self.MessageId,
+            "ChatId": self.ChatId,
+            "Message": self.Message,
+            "Sender": self.Sender.name,
+            "Time": self.Time,
+        }
+
+    def serialize_for_ai(self):
+        return {
+            "sender": self.Sender.name,
+            "content": self.Message,
+        }
 
 
 class Diary(db.Model):
