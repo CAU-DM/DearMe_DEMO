@@ -161,9 +161,9 @@ def generate_chat(client, conversation_history):
 
 
 def generate_diary(client, conversation_history):
-    model = "gpt-4-0613"
+    # model = "gpt-4-0613"
+    model = "gpt-3.5-turbo-0613"
     response_token = 1_500
-    conversation_history.pop(0)
     conversation_history.insert(
         0, {"role": "system", "content": generate_system_prompt}
     )
