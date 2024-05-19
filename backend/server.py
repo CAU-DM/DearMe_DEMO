@@ -67,7 +67,9 @@ def get_messages():
         db.db.session.commit()
     session["ChatId"] = chat.ChatId
     session.modified = True
-    return jsonify({"messages": [msg.serialize() for msg in chat.Messages]})
+    return jsonify(
+        {"status": "success", "messages": [msg.serialize() for msg in chat.Messages]}
+    )
 
     # uIdList = (
     #     db.Element.query.filter_by(user_id=user.UId).order_by(db.Element.id.desc()).first()
@@ -134,17 +136,34 @@ def submit_message():
 def generate_message():
     global client
 
-    response_message = ai.generate_diary(client, session["ChatId"])
-    session.modified = True
-    tmpElement = db.Element.query.filter_by(id=session["nowEleId"]).first()
-    tmpElement.content = json.dumps(session["ChatId"], ensure_ascii=False)
-    tmpElement.state = 1
-    tmpElement.feed = response_message
-    tmpElement.feedTime = datetime.now()
+    chat = db.Chat.query.filter_by(ChatId=session["ChatId"]).first()
+    messege_list_for_ai = [msg.serialize_for_ai() for msg in chat.Messages]
+    response_message = db.Message(
+        ChatId=session["ChatId"],
+        Message=ai.generate_chat(client, messege_list_for_ai),
+        Sender=db.SenderEnum.ASSISTANT,
+    )
+    db.db.session.add(
+        db.Message(
+            ChatId=session["ChatId"], Sender=db.SenderEnum.USER, Content="Generate."
+        )
+    )
+    db.db.session.add(response_message)
     db.db.session.commit()
 
-    response_data = {"status": "success", "message": response_message}
-    return jsonify(response_data)
+    return jsonify({"status": "success", "message": response_message.serialize()})
+
+    # response_message = ai.generate_diary(client, session["ChatId"])
+    # session.modified = True
+    # tmpElement = db.Element.query.filter_by(id=session["nowEleId"]).first()
+    # tmpElement.content = json.dumps(session["ChatId"], ensure_ascii=False)
+    # tmpElement.state = 1
+    # tmpElement.feed = response_message
+    # tmpElement.feedTime = datetime.now()
+    # db.db.session.commit()
+
+    # response_data = {"status": "success", "message": response_message}
+    # return jsonify(response_data)
 
 
 @app.route("/get_feeds", methods=["GET"])
