@@ -142,23 +142,18 @@ def create_openai_client():
     return openai.OpenAI(api_key=os.getenv("GPT_API_KEY"))
 
 
-def generate_chat(client, user_input, conversation_history):
+def generate_chat(client, messages_for_ai):
     model = "gpt-3.5-turbo-0613"
     response_token = 500
-    conversation_history.append({"content": user_input, "role": "user"})
-    conversation_history = trim_conversation_history(
-        conversation_history, 4_096, model, response_token
+    messages_for_ai = trim_conversation_history(
+        messages_for_ai, 4_096, model, response_token
     )
     response = client.chat.completions.create(
         model=model,
-        messages=conversation_history,
+        messages=messages_for_ai,
         max_tokens=response_token,
         temperature=0.7,
     )
-    conversation_history.append(
-        {"role": "assistant", "content": response.choices[0].message.content.strip()}
-    )
-
     return response.choices[0].message.content.strip()
 
 
