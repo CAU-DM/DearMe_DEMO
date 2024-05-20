@@ -22,8 +22,10 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
     let day = startDate;
     let formattedDate = '';
 
-    const dates = ['2024-05-29', '2024-05-02'];
-    const imgUrl = '../public/img/cheon.png';
+    const datesImage = {
+        '2024-05-29': '../public/img/cheon.png',
+        '2024-05-02': '../public/img/cheon.png',
+    };
 
     while (day <= endDate) {
         for (let i = 0; i < 7; i++) {
@@ -38,8 +40,10 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
                             ? ''
                             : isSameDay(day, selectedDate)
                             ? 'bg-red-300 hover:bg-slate-300'
-                            : dates.includes(formattedCloneDay)
-                            ? "bg-[url('../public/img/cheon.png')] bg-cover opacity-75"
+                            : datesImage[formattedCloneDay]
+                            ? "bg-[url('" +
+                              datesImage[formattedCloneDay] +
+                              "')] bg-cover opacity-75 hover:opacity-100"
                             : format(currentMonth, 'M') !== format(day, 'M')
                             ? ''
                             : 'hover:border-1 hover:bg-slate-300'
