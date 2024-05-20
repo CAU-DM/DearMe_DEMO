@@ -22,17 +22,24 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
     let day = startDate;
     let formattedDate = '';
 
+    const dates = ['2024-05-29', '2024-05-02'];
+    const imgUrl = '../public/img/cheon.png';
+
     while (day <= endDate) {
         for (let i = 0; i < 7; i++) {
             formattedDate = format(day, 'd');
             const cloneDay = day;
+            const formattedCloneDay = format(cloneDay, 'yyyy-MM-dd');
+
             days.push(
                 <div
                     className={`flex flex-col w-16 h-16 rounded-full ${
                         !isSameMonth(day, monthStart)
                             ? ''
                             : isSameDay(day, selectedDate)
-                            ? 'bg-rose-300 hover:bg-slate-300'
+                            ? 'bg-red-300 hover:bg-slate-300'
+                            : dates.includes(formattedCloneDay)
+                            ? "bg-[url('../public/img/cheon.png')] bg-cover opacity-75"
                             : format(currentMonth, 'M') !== format(day, 'M')
                             ? ''
                             : 'hover:border-1 hover:bg-slate-300'
