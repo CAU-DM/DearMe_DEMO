@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './Feed.module.css';
 import { BiCheck } from 'react-icons/bi';
 import { BiEditAlt } from 'react-icons/bi';
@@ -6,6 +6,21 @@ import { BiEditAlt } from 'react-icons/bi';
 function FeedItem({ date, image, content }) {
     const [isEditing, setIsEditing] = useState(false);
     const [editedContent, setEditedContent] = useState(content);
+    const [img, setImg] = useState(null);
+
+    useEffect(() => {
+      const fetchImg = async () => {
+        try {
+          const imageUrl = `/get_feeds/${image}`;
+          console.log("Image URL:", imageUrl);
+          setImg(imageUrl);
+        } catch (error) {
+          console.error("Error fetching img:", error);
+        }
+      };
+
+      fetchImg();
+    }, [image]);
 
     const handleEdit = () => {
         setIsEditing(true);
@@ -42,7 +57,7 @@ function FeedItem({ date, image, content }) {
             </button>
           )}
       </div>
-      <img src={image} alt="Feed" />
+      <img src={img} alt="Feed" />
       {isEditing ? (
         <textarea
           value={editedContent}
