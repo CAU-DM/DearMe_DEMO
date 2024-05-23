@@ -5,6 +5,7 @@ import CalendarButton from './calendar/CalendarButton';
 import FeedButton from './calendar/FeedButton';
 import { format } from 'date-fns';
 import { GiStrawberry } from 'react-icons/gi';
+import { FaRegCalendarAlt } from 'react-icons/fa';
 
 function Header({
     userData,
@@ -49,9 +50,12 @@ function Header({
                                 <FeedButton />
                             </button>
                         ) : (
-                            <button onClick={() => setIsCalendar(true)}>
-                                <CalendarButton />
-                            </button>
+                            <div className="header_btn">
+                                <button onClick={() => setIsCalendar(true)}>
+                                    <FaRegCalendarAlt size={18} />
+                                    <p>{windowWidth > 1080 ? 'Calendar' : ''}</p>
+                                </button>
+                            </div>
                         )}
                     </div>
                     <div>
@@ -59,7 +63,7 @@ function Header({
                             userData={userData}
                             windowWidth={windowWidth}
                         />
-                        <div className="about_btn">
+                        <div className="header_btn">
                             <button onClick={() => setModalIsOpen(true)}>
                                 <GiStrawberry size={20} />
                                 <p>{windowWidth > 1080 ? 'About Us' : ''}</p>
@@ -73,7 +77,7 @@ function Header({
                 </div>
             ) : (
                 <div>
-                    <div className="about_btn">
+                    <div className="header_btn">
                         <button onClick={() => setModalIsOpen(true)}>
                             <GiStrawberry size={20} />
                             <p>{windowWidth > 1080 ? 'About Us' : ''}</p>
