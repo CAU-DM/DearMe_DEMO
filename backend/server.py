@@ -13,6 +13,7 @@ def create_app():
     app.secret_key = os.urandom(24)
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "uploads")
     db.db.init_app(app)
     with app.app_context():
         db.db.drop_all()
@@ -153,7 +154,7 @@ def generate_message():
     new_diary = db.Diary(
         ChatId=session["ChatId"],
         Content=response_message.Message,
-        ImgURL="../frontend/public/img/cheon.png",
+        ImgURL="cheon.png",
     )
     db.db.session.add(new_diary)
 
@@ -168,11 +169,15 @@ def get_feeds():
 
     user = db.User.query.filter_by(UId=session["UId"]).first()
     chatList = user.Chats
-    diaryList = [chat.Diary for chat in chatList if chat.Diary is not None]
+    diaryList = [chat.Diary for chat in chatList if len(chat.Diary) == 1]
     print(diaryList)
 
     return jsonify({"feedList": [diary[0].serialize() for diary in diaryList]})
 
+
+@app.route("/get_feeds/<path:filename>", methods=["GET"])
+def download_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 if __name__ == "__main__":
     client = ai.create_openai_client()
