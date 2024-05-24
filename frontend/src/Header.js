@@ -76,7 +76,7 @@ function Header({
                     </div>
                 </div>
             ) : (
-                <div>
+                <div className='buttons'>
                     <div className="header_btn">
                         <button onClick={() => setModalIsOpen(true)}>
                             <GiStrawberry size={20} />
