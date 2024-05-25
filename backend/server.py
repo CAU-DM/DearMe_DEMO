@@ -180,6 +180,23 @@ def get_feeds_by_filename(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
+@app.route("/get_feeds/mounth/<path:month>", methods=["GET"])
+def get_days_with_diaries(month):
+    if "UId" not in session:
+        return jsonify({"status": "error", "message": "User not logged in."})
+
+    user = db.User.query.filter_by(UId=session["UId"]).first()
+    chatList = user.Chats
+    diaryList = [chat.Diary for chat in chatList if len(chat.Diary) == 1]
+    diaryList = [diary[0].serialize() for diary in diaryList]
+    days_with_diaries = [
+        diary["created_at"].strftime("%d")
+        for diary in diaryList
+        if diary["created_at"].strftime("%m") == month
+    ]
+    
+    return jsonify({"status": "success", "days": days_with_diaries})
+
 
 @app.route("/get_feeds/mounth/<path:month>/day/<path:day>", methods=["GET"])
 def get_feeds_by_date(month, day):
