@@ -16,7 +16,7 @@ def create_app():
     app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "uploads")
     db.db.init_app(app)
     with app.app_context():
-        db.db.drop_all()
+        # db.db.drop_all()
         db.db.create_all()
     return app
 
@@ -178,6 +178,25 @@ def get_feeds():
 @app.route("/get_feeds/<path:filename>", methods=["GET"])
 def download_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
+
+@app.route("/get_mounthly_feeds_data/<path:mounth>", methods=["GET"])
+def get_mounthly_feeds_data(mounth):
+    if "UId" not in session:
+        return jsonify({"status": "error", "message": "User not logged in."})
+
+    user = db.User.query.filter_by(UId=session["UId"]).first()
+    chatList = user.Chats
+    diaryList = [chat.Diary for chat in chatList if len(chat.Diary) == 1]
+    diaryList.reverse()
+
+    mounthly_diary_list = [
+        diary[0].serialize()
+        for diary in diaryList
+        if diary[0].Date.strftime("%Y-%m") == mounth
+    ]
+
+    return jsonify({"feedList": mounthly_diary_list})
 
 if __name__ == "__main__":
     client = ai.create_openai_client()
