@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     startOfMonth,
     endOfMonth,
@@ -7,7 +7,6 @@ import {
     isSameMonth,
     isSameDay,
     addDays,
-    parse,
     format,
 } from 'date-fns';
 
@@ -17,21 +16,52 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
     const startDate = startOfWeek(monthStart);
     const endDate = endOfWeek(monthEnd);
 
+    const [datesImage, setDatesImage] = useState({});
+
+    useEffect(() => {
+        const fetchImage = async (month, day) => {
+            try {
+                const response = await fetch(`/get_feeds/mounth/${month}/day/${day}`);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const imageUrl = URL.createObjectURL(blob);
+                    setDatesImage((prev) => ({ ...prev, [`${month}-${day}`]: imageUrl }));
+                }
+            } catch (error) {
+                console.error('Error fetching image:', error);
+            }
+        };
+
+        const loadImages = () => {
+            const daysInMonth = endOfMonth(currentMonth).getDate();
+            const month = format(currentMonth, 'MM');
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayFormatted = day.toString().padStart(2, '0');
+                fetchImage(month, dayFormatted);
+            }
+        };
+
+        loadImages();
+    }, [currentMonth]);
+
     const rows = [];
     let days = [];
     let day = startDate;
     let formattedDate = '';
-
-    const datesImage = {
-        '2024-05-29': '../public/img/cheon.png',
-        '2024-05-02': '../public/img/cheon.png',
-    };
 
     while (day <= endDate) {
         for (let i = 0; i < 7; i++) {
             formattedDate = format(day, 'd');
             const cloneDay = day;
             const formattedCloneDay = format(cloneDay, 'yyyy-MM-dd');
+            const monthDayKey = format(day, 'MM-dd');
+
+            const dayStyle = {
+                backgroundImage: datesImage[monthDayKey] ? `url(${datesImage[monthDayKey]})` : 'none',
+                backgroundSize: 'cover',
+                opacity: datesImage[monthDayKey] ? 0.75 : 1,
+                transition: 'opacity 0.3s',
+            };
 
             days.push(
                 <div
@@ -40,17 +70,23 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
                             ? ''
                             : isSameDay(day, selectedDate)
                             ? 'bg-red-300 hover:bg-slate-300'
-                            : datesImage[formattedCloneDay]
-                            ? "bg-[url('" +
-                              datesImage[formattedCloneDay] +
-                              "')] bg-cover opacity-75 hover:opacity-100"
                             : format(currentMonth, 'M') !== format(day, 'M')
                             ? ''
                             : 'hover:border-1 hover:bg-slate-300'
                     }`}
                     key={day}
                     onClick={() => onDateClick(format(cloneDay, 'yyyy-MM-dd'))}
-                    // onClick={() => console.log(parse(cloneDay))}
+                    style={dayStyle}
+                    onMouseEnter={(e) => {
+                        if (datesImage[monthDayKey]) {
+                            e.currentTarget.style.opacity = 1;
+                        }
+                    }}
+                    onMouseLeave={(e) => {
+                        if (datesImage[monthDayKey]) {
+                            e.currentTarget.style.opacity = 0.75;
+                        }
+                    }}
                 >
                     <span
                         className={
