@@ -170,7 +170,7 @@ def get_feeds():
     user = db.User.query.filter_by(UId=session["UId"]).first()
     chatList = user.Chats
     diaryList = [chat.Diary for chat in chatList if len(chat.Diary) == 1]
-    print(diaryList)
+    diaryList.reverse()
 
     return jsonify({"feedList": [diary[0].serialize() for diary in diaryList]})
 
