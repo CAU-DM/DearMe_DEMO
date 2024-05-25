@@ -65,15 +65,14 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
 
             days.push(
                 <div
-                    className={`flex flex-col w-16 h-16 rounded-full ${
-                        !isSameMonth(day, monthStart)
+                    className={`flex flex-col w-16 h-16 rounded-full ${!isSameMonth(day, monthStart)
                             ? ''
                             : isSameDay(day, selectedDate)
-                            ? 'bg-red-300 hover:bg-slate-300'
-                            : format(currentMonth, 'M') !== format(day, 'M')
-                            ? ''
-                            : 'hover:border-1 hover:bg-slate-300'
-                    }`}
+                                ? 'bg-red-300 hover:bg-slate-300'
+                                : format(currentMonth, 'M') !== format(day, 'M')
+                                    ? ''
+                                    : 'hover:border-1 hover:bg-slate-300'
+                        }`}
                     key={day}
                     onClick={() => onDateClick(format(cloneDay, 'yyyy-MM-dd'))}
                     style={dayStyle}
