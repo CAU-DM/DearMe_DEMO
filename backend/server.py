@@ -176,27 +176,33 @@ def get_feeds():
 
 
 @app.route("/get_feeds/<path:filename>", methods=["GET"])
-def download_file(filename):
+def get_feeds_by_filename(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
-@app.route("/get_mounthly_feeds_data/<path:mounth>", methods=["GET"])
-def get_mounthly_feeds_data(mounth):
+
+@app.route("/get_feeds/mounth/<path:month>/day/<path:day>", methods=["GET"])
+def get_feeds_by_date(month, day):
     if "UId" not in session:
         return jsonify({"status": "error", "message": "User not logged in."})
 
     user = db.User.query.filter_by(UId=session["UId"]).first()
     chatList = user.Chats
     diaryList = [chat.Diary for chat in chatList if len(chat.Diary) == 1]
+    diaryList = [diary[0].serialize() for diary in diaryList]
+    diaryList = [
+        diary
+        for diary in diaryList
+        if diary["created_at"].strftime("%m") == month
+        and diary["created_at"].strftime("%d") == day
+    ]
     diaryList.reverse()
 
-    mounthly_diary_list = [
-        diary[0].serialize()
-        for diary in diaryList
-        if diary[0].Date.strftime("%Y-%m") == mounth
-    ]
+    if not diaryList:
+        return jsonify({"status": "error", "message": "No diary entry found."})
 
-    return jsonify({"feedList": mounthly_diary_list})
+    return send_from_directory(app.config["UPLOAD_FOLDER"], diaryList[0]["img_url"])
+
 
 if __name__ == "__main__":
     client = ai.create_openai_client()
