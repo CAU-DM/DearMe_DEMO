@@ -17,6 +17,26 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
     const endDate = endOfWeek(monthEnd);
 
     const [datesImage, setDatesImage] = useState({});
+    const [daysWithDiaries, setDaysWithDiaries] = useState([]);
+
+    useEffect(() => {
+        const fetchDaysWithDiaries = async (month) => {
+            try {
+                const response = await fetch(`/get_feeds/mounth/${month}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === "success") {
+                        setDaysWithDiaries(data.days);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching days with diaries:', error);
+            }
+        };
+
+        const month = format(currentMonth, 'MM');
+        fetchDaysWithDiaries(month);
+    }, [currentMonth]);
 
     useEffect(() => {
         const fetchImage = async (month, day) => {
@@ -32,17 +52,13 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
             }
         };
 
-        const loadImages = () => {
-            const daysInMonth = endOfMonth(currentMonth).getDate();
+        if (daysWithDiaries.length > 0) {
             const month = format(currentMonth, 'MM');
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayFormatted = day.toString().padStart(2, '0');
-                fetchImage(month, dayFormatted);
-            }
-        };
-
-        loadImages();
-    }, [currentMonth]);
+            daysWithDiaries.forEach(day => {
+                fetchImage(month, day);
+            });
+        }
+    }, [daysWithDiaries, currentMonth]);
 
     const rows = [];
     let days = [];
@@ -65,14 +81,15 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
 
             days.push(
                 <div
-                    className={`flex flex-col w-16 h-16 rounded-full ${!isSameMonth(day, monthStart)
+                    className={`flex flex-col w-16 h-16 rounded-full ${
+                        !isSameMonth(day, monthStart)
                             ? ''
                             : isSameDay(day, selectedDate)
-                                ? 'bg-red-300 hover:bg-slate-300'
-                                : format(currentMonth, 'M') !== format(day, 'M')
-                                    ? ''
-                                    : 'hover:border-1 hover:bg-slate-300'
-                        }`}
+                            ? 'bg-red-300 hover:bg-slate-300'
+                            : format(currentMonth, 'M') !== format(day, 'M')
+                            ? ''
+                            : 'hover:border-1 hover:bg-slate-300'
+                    }`}
                     key={day}
                     onClick={() => onDateClick(format(cloneDay, 'yyyy-MM-dd'))}
                     style={dayStyle}
