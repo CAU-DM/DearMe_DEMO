@@ -8,6 +8,7 @@ __pycache__/
 
 myenv
 nohup.out
+backend/uploads
 
 # Distribution / packaging
 .Python
