@@ -7,9 +7,9 @@ import styles from "./Chat.module.css";
 function getTimeString() {
   const now = new Date();
 
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
 
   return `${hours}:${minutes}:${seconds}`;
 }
@@ -18,25 +18,25 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [genButtonKey, setGenButtonKey] = useState(0);
+  const [imgFile, setImgFile] = useState(null);
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
   const today = new Date();
 
   useEffect(() => {
-    fetch('/get_messages', {
-      method: 'GET',
+    fetch("/get_messages", {
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     })
       .then((response) => {
-        if (!response.ok)
-          throw new Error('Network response was not ok');
+        if (!response.ok) throw new Error("Network response was not ok");
         return response.json();
       })
       .then((data) => {
         setMessages(data.messages);
-      })
+      });
   }, []);
 
   useEffect(() => {
@@ -52,10 +52,10 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
     }
   }, [inputText]);
 
-  const formattedDate = today.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  const formattedDate = today.toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   const handleInputChange = (event) => {
@@ -73,7 +73,11 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
       let content = inputText.trim();
 
       if (content) {
-        const newMessage = { content: content, role: "user", time: getTimeString() };
+        const newMessage = {
+          content: content,
+          role: "user",
+          time: getTimeString(),
+        };
         setMessages((messages) => {
           const updatedMessages = [...messages, newMessage];
           setTimeout(() => {
@@ -97,7 +101,11 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
             if (data.status === "success") {
               setMessages((messages) => [
                 ...messages,
-                { content: data.message.content, role: data.message.role, time: getTimeString() },
+                {
+                  content: data.message.content,
+                  role: data.message.role,
+                  time: getTimeString(),
+                },
               ]);
             }
             setIsLoading(false);
@@ -109,23 +117,27 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
 
   const handleGenClick = () => {
     if (!isLoading && !isGenerated) {
-      let content = ["Generate.", "일기를 작성하고 있어!", "일기 생성이 완료되었어! 피드를 확인해봐!"];
+      let content = [
+        "Generate.",
+        "일기를 작성하고 있어!",
+        "일기 생성이 완료되었어!\n이제 오늘의 사진을 보내줘!",
+      ];
 
       if (content) {
-        const newMessage = { content: content[0], role: "user", time: getTimeString() };
+        const newMessage = {
+          content: content[0],
+          role: "user",
+          time: getTimeString(),
+        };
         setMessages((messages) => [...messages, newMessage]);
         setInputText("");
         setIsLoading(true);
-        // setMessages((messages) => [
-        //   ...messages,
-        //   { content: "", role: "photo" },
-        // ]);
         setMessages((messages) => [
           ...messages,
           {
             content: content[1],
             role: "assistant",
-            time: getTimeString()
+            time: getTimeString(),
           },
         ]);
         fetch("/generate_message", {
@@ -140,12 +152,20 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
             if (data.status === "success") {
               setMessages((messages) => [
                 ...messages,
-                { content: data.message.content, role: data.message.role, time: getTimeString() },
+                {
+                  content: data.message.content,
+                  role: data.message.role,
+                  time: getTimeString(),
+                },
                 {
                   content: content[2],
                   role: "assistant",
-                  time: getTimeString()
+                  time: getTimeString(),
                 },
+              ]);
+              setMessages((messages) => [
+                ...messages,
+                { content: "", role: "photo" },
               ]);
             }
             setIsLoading(false);
@@ -153,6 +173,48 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
           })
           .catch((error) => console.error("Error:", error));
       }
+    }
+  };
+
+  const base64ToBlob = (base64, mimeType) => {
+    const byteString = atob(base64.split(",")[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeType });
+  };
+
+  const handleCheckClick = async () => {
+    if (!imgFile) {
+      alert("No image file to upload.");
+      return;
+    }
+
+    const mimeType = imgFile.split(",")[0].split(":")[1].split(";")[0];
+    const blob = base64ToBlob(imgFile, mimeType);
+    const fileName = `image_${Date.now()}.png`; // You can change the file extension based on mimeType if necessary
+
+    const formData = new FormData();
+    formData.append("file", new File([blob], fileName, { type: mimeType }));
+
+    try {
+      const response = await fetch("/submit_photo", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      const result = await response.json();
+      if (result.status === "success") {
+        window.location.reload();
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      alert("Error uploading file.");
     }
   };
 
@@ -167,20 +229,18 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         <span className={styles.profile_name}>Dear Me</span>
       </div>
       <div className={styles.messages}>
-        {
-          messages.length > 0 && !isGenerated ? (
-            <div className={styles.date_container}>
-              <p> {formattedDate}</p>
-            </div>
-          ) : (
-            <></>
-          )
-        }
+        {messages.length > 0 && !isGenerated ? (
+          <div className={styles.date_container}>
+            <p> {formattedDate}</p>
+          </div>
+        ) : (
+          <></>
+        )}
         {messages.map((message, index) => {
           if (message.role === "photo") {
             return (
               <div className={styles.message_assistant}>
-                <PhotoDrop key={index} />
+                <PhotoDrop key={index} file={imgFile} setFile={setImgFile} />
               </div>
             );
           } else {
@@ -208,16 +268,14 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
               setGenButtonKey((prevKey) => prevKey + 1);
             }}
             key={genButtonKey}
-            className={styles.gen_button}>
-          </div>
+            className={styles.gen_button}
+          ></div>
         </div>
       ) : (
         <></>
-      )
-
-      }
+      )}
       <div className={styles.input_area}>
-        {!isGenerated ? (
+        {!isGenerated || imgFile == null ? (
           <>
             <input
               ref={inputRef}
@@ -232,7 +290,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
             </i>
           </>
         ) : (
-          <i onClick={() => window.location.reload()}>
+          <i onClick={handleCheckClick}>
             <FaCircleCheck size={32} color="green" />
           </i>
         )}
