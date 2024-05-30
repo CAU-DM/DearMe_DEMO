@@ -58,19 +58,19 @@ function App() {
                 // <button onClick={setUserData(1)}>강제 로그인</button>
             )}
             <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={() => setModalIsOpen(false)}
-        contentLabel="About Us"
-        className="ReactModal__Content"
-        overlayClassName="ReactModal__Overlay"
-      >
-        <div className="modal-content">
-          <button className="close-button" onClick={() => setModalIsOpen(false)}>
-            <AiOutlineClose size={20} />
-          </button>
-          <img src="/img/team_illust.png" alt="Team Introduction" />
-        </div>
-      </Modal>
+            isOpen={modalIsOpen}
+            onRequestClose={() => setModalIsOpen(false)}
+            contentLabel="About Us"
+            className="ReactModal__Content"
+            overlayClassName="ReactModal__Overlay"
+            >
+                <div className="modal-content">
+                <button className="close-button" onClick={() => setModalIsOpen(false)}>
+                    <AiOutlineClose size={20} />
+                </button>
+                <img src="/img/team_illust.png" alt="Team Introduction" />
+                </div>
+            </Modal>
         </div>
     );
 }

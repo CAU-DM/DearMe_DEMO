@@ -116,6 +116,10 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         setMessages((messages) => [...messages, newMessage]);
         setInputText("");
         setIsLoading(true);
+        // setMessages((messages) => [
+        //   ...messages,
+        //   { content: "", role: "photo" },
+        // ]);
         setMessages((messages) => [
           ...messages,
           {
@@ -174,7 +178,11 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         }
         {messages.map((message, index) => {
           if (message.role === "photo") {
-            return <PhotoDrop key={index} />;
+            return (
+              <div className={styles.message_assistant}>
+                <PhotoDrop key={index} />
+              </div>
+            );
           } else {
             let messageClass =
               message.role === "user"
