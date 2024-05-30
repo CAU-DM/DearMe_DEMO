@@ -1,9 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
+import pytz
 from datetime import datetime
 
 db = SQLAlchemy()
 
+KST = pytz.timezone('Asia/Seoul')
+
+def current_time_kst():
+    return datetime.now(KST)
 
 class Element(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,7 +56,7 @@ class Chat(db.Model):
     __tablename__ = "chat"
     ChatId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     UId = db.Column(db.Integer, db.ForeignKey("user.UId"), nullable=False)
-    Date = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    Date = db.Column(db.DateTime, default=current_time_kst, nullable=False)
 
     Messages = db.relationship("Message", backref="chat", lazy=True)
     Diary = db.relationship("Diary", backref="chat", lazy=True)
@@ -87,9 +92,9 @@ class Diary(db.Model):
     ChatId = db.Column(db.Integer, db.ForeignKey("chat.ChatId"), nullable=False)
     Content = db.Column(db.Text, nullable=True)
     ImgURL = db.Column(db.String, nullable=True)
-    CreatedAt = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    CreatedAt = db.Column(db.DateTime, default=current_time_kst, nullable=False)
     UpdatedAt = db.Column(
-        db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False
+        db.DateTime, default=current_time_kst, onupdate=current_time_kst, nullable=False
     )
 
     def serialize(self):
