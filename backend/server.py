@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from werkzeug.utils import secure_filename
 import json
 import copy
 import os
@@ -150,16 +151,45 @@ def generate_message():
             ),
         ]
     )
-
-    new_diary = db.Diary(
-        ChatId=session["ChatId"],
-        Content=response_message.Message,
-        ImgURL="cheon.png",
-    )
-    db.db.session.add(new_diary)
-
     db.db.session.commit()
+
     return jsonify({"status": "success", "message": response_message.serialize()})
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+
+@app.route("/submit_photo", methods=["POST"])
+def submit_photo():
+    if "UId" not in session:
+        return jsonify({"status": "error", "message": "User not logged in."})
+
+    if "file" not in request.files:
+        return jsonify({"status": "error", "message": "No file part in the request."})
+
+    file = request.files["file"]
+
+    if file.filename == '':
+        return jsonify({"status": "error", "message": "No selected file."})
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filename = f"{session['UId']}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{filename.rsplit('.', 1)[1].lower()}"
+        file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+        messages = db.Message.query.filter_by(ChatId=session["ChatId"]).order_by(db.Message.MessageId.desc()).limit(2).all()
+        response_message = messages[1]
+
+        new_diary = db.Diary(
+            ChatId=session["ChatId"],
+            Content=response_message.Message,
+            ImgURL=filename,
+        )
+        db.db.session.add(new_diary)
+        db.db.session.commit()
+        return jsonify({"status": "success"})
+    else:
+        return jsonify({"status": "error", "message": "Invalid file type."})
 
 
 @app.route("/get_feeds", methods=["GET"])
