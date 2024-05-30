@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import styles from "./Feed.module.css";
-import { BiCheck } from "react-icons/bi";
-import { BiEditAlt } from "react-icons/bi";
+import { BiCheck, BiEditAlt } from "react-icons/bi";
 
-function FeedItem({ date, image, content }) {
+const FeedItem = forwardRef(({ date, image, content }, ref) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
   const [img, setImg] = useState(null);
@@ -49,7 +48,7 @@ function FeedItem({ date, image, content }) {
   const formattedDate = formatDate(date);
 
   return (
-    <div className={styles.feed_item}>
+    <div className={styles.feed_item} ref={ref}>
       <div className={styles.feed_item_header}>
         <div className={styles.date_text}>{formattedDate}의 일기</div>
         {isEditing ? (
@@ -74,6 +73,6 @@ function FeedItem({ date, image, content }) {
       )}
     </div>
   );
-}
+});
 
 export default FeedItem;
