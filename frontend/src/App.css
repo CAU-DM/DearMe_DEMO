@@ -193,6 +193,10 @@ html {
       flex-direction: row;
       align-items: center;
     }
+
+    .buttons {
+        margin-bottom: 0px;
+    }
 }
 
 @media (min-width: 768px) and (max-width: 1080px) {
