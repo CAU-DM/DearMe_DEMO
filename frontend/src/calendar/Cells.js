@@ -97,6 +97,7 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
           } ${isDiaryDay ? "cursor-pointer" : "cursor-default"}`}
           key={day}
           onClick={
+            // 왠지 모르겠는데 1~9일은 클릭이 안 되는 버그가 있음
             format(currentMonth, "M") == format(day, "M") && isDiaryDay
               ? () => onDateClick(format(cloneDay, "yyyy-MM-dd"))
               : undefined
