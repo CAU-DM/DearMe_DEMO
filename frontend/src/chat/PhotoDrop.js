@@ -12,16 +12,16 @@ const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
     padding: '20px',
     border: '3px dashed #cccccc',
     borderRadius: '10px',
-    backgroundColor: '#f9f9f9',
-    color: '#333333',
+    backgroundColor: '#22232c',
+    color: '#f9f9f9',
     textAlign: 'center',
     transition: 'border 0.3s ease-in-out'
   }})}>
     <input {...getInputProps()} />
     {
       isDragActive ?
-      <p>사진을 놓으세요</p> :
-      <p>사진을 끌어다 놓으세요</p>
+      <p>Drop It! 😎</p> :
+      <p>Drag Photo 🌃</p>
     }
   </div>
   );
