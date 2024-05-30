@@ -249,10 +249,14 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
                 ? styles.message_user
                 : styles.message_assistant;
             if (message.role === "user" || message.role === "assistant") {
+              let timeNow = message.time.slice(0, -3);
               return (
-                <div key={index} className={messageClass}>
-                  {message.content}
-                  {message.time}
+                <div className={styles.message_container}>
+                  {message.role === "user" ?(<div className={styles.message_time}>{timeNow}</div>):(<></>)}
+                  <div key={index} className={messageClass}>
+                    {message.content}
+                  </div>
+                  {message.role === "assistant" ?(<div><div className={styles.message_time}>{timeNow}</div><div className={styles.spacer}></div></div>):(<></>)}
                 </div>
               );
             }
