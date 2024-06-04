@@ -10,6 +10,8 @@ import db
 from db import current_time_kst
 
 
+MIN_MESSAGE_NUM = 6
+
 def create_app():
     app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
     app.secret_key = os.urandom(24)
@@ -58,6 +60,7 @@ def get_messages():
     if "UId" not in session:
         return jsonify({"status": "error", "message": "User not logged in."})
 
+    chatStatus = 0
     chat = (
         db.Chat.query.filter_by(UId=session["UId"])
         .order_by(db.Chat.Date.desc())
@@ -67,7 +70,7 @@ def get_messages():
         chat = db.Chat(UId=session["UId"])
         db.db.session.add(chat)
         db.db.session.flush()
-        print("here", chat.ChatId)
+        print("new chat open:", chat.ChatId)
         default_message = db.Message(
             ChatId=chat.ChatId,
             Sender=db.SenderEnum.assistant,
@@ -76,10 +79,19 @@ def get_messages():
         )
         db.db.session.add(default_message)
         db.db.session.commit()
+    elif chat.Messages[-1].Sender == db.SenderEnum.photo:
+        chatStatus = 2
+    elif len(chat.Messages) >= MIN_MESSAGE_NUM:
+        chatStatus = 1
     session["ChatId"] = chat.ChatId
     session.modified = True
+
     return jsonify(
-        {"status": "success", "messages": [msg.serialize() for msg in chat.Messages]}
+        {
+            "status": "success",
+            "messages": [msg.serialize() for msg in chat.Messages],
+            "chatStatus": chatStatus,
+        }
     )
 
 
@@ -150,6 +162,12 @@ def generate_message():
                 Message=request_messages[2],
                 Time=current_time_kst().time(),
             ),
+            db.Message(
+                ChatId=session["ChatId"],
+                Sender=db.SenderEnum.photo,
+                Message="",
+                Time=current_time_kst().time(),
+            ),
         ]
     )
     db.db.session.commit()
@@ -158,7 +176,13 @@ def generate_message():
 
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in {
+        "png",
+        "jpg",
+        "jpeg",
+        "gif",
+    }
+
 
 @app.route("/submit_photo", methods=["POST"])
 def submit_photo():
@@ -170,7 +194,7 @@ def submit_photo():
 
     file = request.files["file"]
 
-    if file.filename == '':
+    if file.filename == "":
         return jsonify({"status": "error", "message": "No selected file."})
 
     if file and allowed_file(file.filename):
@@ -178,8 +202,13 @@ def submit_photo():
         filename = f"{session['UId']}_{current_time_kst().strftime('%Y%m%d%H%M%S')}.{filename.rsplit('.', 1)[1].lower()}"
         file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
-        messages = db.Message.query.filter_by(ChatId=session["ChatId"]).order_by(db.Message.MessageId.desc()).limit(2).all()
-        response_message = messages[1]
+        messages = (
+            db.Message.query.filter_by(ChatId=session["ChatId"])
+            .order_by(db.Message.MessageId.desc())
+            .limit(3)
+            .all()
+        )
+        response_message = messages[2]
 
         new_diary = db.Diary(
             ChatId=session["ChatId"],
@@ -225,7 +254,7 @@ def get_days_with_diaries(month):
         for diary in diaryList
         if diary["created_at"].strftime("%m") == month
     ]
-    
+
     return jsonify({"status": "success", "days": days_with_diaries})
 
 
