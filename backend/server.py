@@ -12,6 +12,7 @@ from db import current_time_kst
 
 MIN_MESSAGE_NUM = 6
 
+
 def create_app():
     app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
     app.secret_key = os.urandom(24)
@@ -122,7 +123,16 @@ def submit_message():
     db.db.session.add(user_message)
     db.db.session.add(response_message)
     db.db.session.commit()
-    return jsonify({"status": "success", "message": response_message.serialize()})
+    chatStatus = 0
+    if len(messege_list) + 2 >= MIN_MESSAGE_NUM:
+        chatStatus = 1
+    return jsonify(
+        {
+            "status": "success",
+            "message": response_message.serialize(),
+            "chatStatus": chatStatus,
+        }
+    )
 
 
 @app.route("/generate_message", methods=["POST"])
