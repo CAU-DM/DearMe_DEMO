@@ -2,13 +2,22 @@ import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
 function PhotoDrop({ file, setFile }) {
+  const [error, setError] = useState(null);
+
   const onDrop = useCallback((acceptedFiles) => {
+    const file = acceptedFiles[0];
+    if (file.size > 5 * 1024 * 1024) { // 10MB 제한
+      setError("File size exceeds 5MB 😰");
+      return;
+    }
+    
     const reader = new FileReader();
     reader.onload = () => {
       setFile(reader.result);
+      setError(null);
     };
-    reader.readAsDataURL(acceptedFiles[0]);
-  }, []);
+    reader.readAsDataURL(file);
+  }, [setFile]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -33,6 +42,7 @@ function PhotoDrop({ file, setFile }) {
     >
       <input {...getInputProps()} />
       {isDragActive ? <p>Drop It! 😎</p> : <p>Drag Photo 🌃</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
       {file && (
         <img
           src={file}
