@@ -9,12 +9,12 @@ import {
 import { RiLogoutBoxRLine, RiUserFollowLine } from 'react-icons/ri';
 import styles from './Login.module.css';
 
-function Login({ setUserData, setMessages }) {
+function Login({ setUserData }) {
     const [disabled, setDisabled] = useState(true);
     useEffect(() => {
         auth.onAuthStateChanged((user) => {
             if (user) {
-                fetch('/login-success', {
+                fetch('/login_success', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -26,16 +26,11 @@ function Login({ setUserData, setMessages }) {
                     }),
                 })
                     .then((response) => {
-                        if (!response.ok) {
+                        if (!response.ok)
                             throw new Error('Network response was not ok');
-                        }
                         return response.json();
                     })
                     .then((data) => {
-                        setMessages(JSON.parse(data.messeges));
-                        return JSON.parse(data.messeges);
-                    })
-                    .then((log) => {
                         setUserData(user);
                     })
                     .catch((error) => {

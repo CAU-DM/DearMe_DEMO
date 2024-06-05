@@ -1,48 +1,67 @@
-import { useState } from 'react';
-import styles from './Feed.module.css';
-import { BiCheck } from 'react-icons/bi';
-import { BiEditAlt } from 'react-icons/bi';
+import { useState, useEffect, forwardRef } from "react";
+import styles from "./Feed.module.css";
+import { BiCheck, BiEditAlt } from "react-icons/bi";
 
-function FeedItem({ date, image, content }) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedContent, setEditedContent] = useState(content);
+const FeedItem = forwardRef(({ date, image, content }, ref) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(content);
+  const [img, setImg] = useState(null);
 
-    const handleEdit = () => {
-        setIsEditing(true);
+  useEffect(() => {
+    const fetchImg = async () => {
+      try {
+        const imageUrl = `/get_feeds/${image}`;
+        console.log("Image URL:", imageUrl);
+        setImg(imageUrl);
+      } catch (error) {
+        console.error("Error fetching img:", error);
+      }
     };
 
-    const handleSave = () => {
-        setIsEditing(false);
-    };
+    fetchImg();
+  }, [image]);
 
-    const handleInputChange = (e) => {
-        setEditedContent(e.target.value);
-        content = editedContent;
-    };
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
 
-  const feedDate = new Date(date);
+  const handleSave = () => {
+    setIsEditing(false);
+  };
 
-  const formattedDate = feedDate.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const handleInputChange = (e) => {
+    setEditedContent(e.target.value);
+    content = editedContent;
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getUTCFullYear();
+    const month = date.toLocaleString("default", {
+      month: "long",
+      timeZone: "UTC",
+    });
+    const day = date.getUTCDate();
+    return `${year}년 ${month} ${day}일`;
+  };
+
+  const formattedDate = formatDate(date);
 
   return (
-    <div className={styles.feed_item}>
-      <div className={ styles.feed_item_header }>
+    <div className={styles.feed_item} ref={ref}>
+      <div className={styles.feed_item_header}>
         <div className={styles.date_text}>{formattedDate}의 일기</div>
-          {isEditing ? (
-            <button onClick={handleSave} className={styles.save_button}>
-              <BiCheck size={26}/>
-            </button>
-          ) : (
-            <button onClick={handleEdit} className={styles.edit_button}>
-              <BiEditAlt size={22}/>
-            </button>
-          )}
+        {isEditing ? (
+          <button onClick={handleSave} className={styles.save_button}>
+            <BiCheck size={26} />
+          </button>
+        ) : (
+          <button onClick={handleEdit} className={styles.edit_button}>
+            <BiEditAlt size={22} />
+          </button>
+        )}
       </div>
-      <img src={image} alt="Feed" />
+      <img src={img} alt="Feed" />
       {isEditing ? (
         <textarea
           value={editedContent}
@@ -54,7 +73,6 @@ function FeedItem({ date, image, content }) {
       )}
     </div>
   );
-
-}
+});
 
 export default FeedItem;
