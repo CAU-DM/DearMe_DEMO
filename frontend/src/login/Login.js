@@ -50,7 +50,7 @@ function Login({ setUserData }) {
                 return signInWithPopup(auth, provider);
             })
             .catch((err) => {
-                console.log(err);
+                console.err(err);
                 setUserData(null);
                 auth.signOut();
                 setDisabled(false);

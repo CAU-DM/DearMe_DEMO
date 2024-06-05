@@ -16,7 +16,7 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
           credentials: "include",
         });
         const data = await response.json();
-        console.log("Feed List:", data.feedList);
+        // console.log("Feed List:", data.feedList);
         setFeeds(data.feedList);
       } catch (error) {
         console.error("Error fetching feeds:", error);

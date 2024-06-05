@@ -45,7 +45,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-    console.log(messages);
+    // console.log(messages);
   }, [messages]);
 
   useEffect(() => {

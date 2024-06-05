@@ -11,7 +11,7 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
     const fetchImg = async () => {
       try {
         const imageUrl = `/get_feeds/${image}`;
-        console.log("Image URL:", imageUrl);
+        // console.log("Image URL:", imageUrl);
         setImg(imageUrl);
       } catch (error) {
         console.error("Error fetching img:", error);
@@ -29,7 +29,7 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
     setIsEditing(false);
     const fetchDiaryUpdate = async () => {
       try {
-        console.log("Editing diary:", feedId, editedContent);
+        // console.log("Editing diary:", feedId, editedContent);
         const response = await fetch(`/modify_diary/${feedId}`, {
           method: "PUT",
           headers: {
