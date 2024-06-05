@@ -70,6 +70,7 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
       {feeds.map((feed, index) => (
         <FeedItem
           key={feed.id}
+          feedId={feed.id}
           content={feed.content}
           date={feed.created_at}
           image={feed.img_url}
