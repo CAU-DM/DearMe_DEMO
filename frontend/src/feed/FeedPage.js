@@ -55,7 +55,7 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
           });
       }, 0);
     }
-  }, [feeds, feedDate]);
+  }, [feedDate]);
 
   return (
     <div className={styles.feed_page}>
