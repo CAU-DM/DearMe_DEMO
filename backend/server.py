@@ -147,7 +147,7 @@ def generate_message():
     messege_list_for_ai = [msg.serialize_for_ai() for msg in chat.Messages]
     response_message = db.Message(
         ChatId=session["ChatId"],
-        Message=ai.generate_diary(client, messege_list_for_ai),
+        Message=ai.generate_diary(client, messege_list_for_ai).replace("\n", " "),
         Sender=db.SenderEnum.assistant,
         Time=current_time_kst().time(),
     )
@@ -241,7 +241,7 @@ def modify_diary(diaryId):
     diary = db.Diary.query.filter_by(DiaryId=diaryId).first()
     if diary is None:
         return jsonify({"status": "error", "message": "Diary not found."})
-    diary.Content = request_data["content"]
+    diary.Content = request_data["content"].replace("\n", " ")
     db.db.session.commit()
     return jsonify({"status": "success"})
 
