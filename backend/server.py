@@ -232,6 +232,22 @@ def submit_photo():
         return jsonify({"status": "error", "message": "Invalid file type."})
 
 
+@app.route("/modify_diary/<path:diaryId>", methods=["PUT"])
+def modify_diary(diaryId):
+    if "UId" not in session:
+        return jsonify({"status": "error", "message": "User not logged in."})
+
+    request_data = request.get_json()
+    diary = db.Diary.query.filter_by(DiaryId=diaryId).first()
+    print("request_data", request_data, " && diary", diaryId)
+    if diary is None:
+        return jsonify({"status": "error", "message": "Diary not found."})
+    print("diary", diary)
+    diary.Content = request_data["content"]
+    db.db.session.commit()
+    return jsonify({"status": "success"})
+
+
 @app.route("/get_feeds", methods=["GET"])
 def get_feeds():
     if "UId" not in session:
