@@ -239,10 +239,8 @@ def modify_diary(diaryId):
 
     request_data = request.get_json()
     diary = db.Diary.query.filter_by(DiaryId=diaryId).first()
-    print("request_data", request_data, " && diary", diaryId)
     if diary is None:
         return jsonify({"status": "error", "message": "Diary not found."})
-    print("diary", diary)
     diary.Content = request_data["content"]
     db.db.session.commit()
     return jsonify({"status": "success"})
