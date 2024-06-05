@@ -75,6 +75,8 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
           date={feed.created_at}
           image={feed.img_url}
           ref={(el) => (feedRefs.current[index] = el)}
+          setFeeds={setFeeds}
+          feeds={feeds}
         />
       ))}
     </div>
