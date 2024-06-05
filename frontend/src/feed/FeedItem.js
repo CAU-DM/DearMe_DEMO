@@ -2,7 +2,7 @@ import { useState, useEffect, forwardRef } from "react";
 import styles from "./Feed.module.css";
 import { BiCheck, BiEditAlt } from "react-icons/bi";
 
-const FeedItem = forwardRef(({ date, image, content }, ref) => {
+const FeedItem = forwardRef(({ feedId, date, image, content }, ref) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
   const [img, setImg] = useState(null);
@@ -27,11 +27,32 @@ const FeedItem = forwardRef(({ date, image, content }, ref) => {
 
   const handleSave = () => {
     setIsEditing(false);
+    const fetchDiaryUpdate = async () => {
+      try {
+        console.log("Editing diary:", feedId, editedContent);
+        const response = await fetch(`/modify_diary/${feedId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            content: editedContent,
+          }),
+        });
+        const data = await response.json();
+        if (data.status == "success")
+          window.location.reload();
+        else
+          console.error("Failed to update diary:", data);
+      } catch (error) {
+        console.error("Error updating diary:", error);
+      }
+    }
+    fetchDiaryUpdate();
   };
 
   const handleInputChange = (e) => {
     setEditedContent(e.target.value);
-    content = editedContent;
   };
 
   const formatDate = (dateString) => {
