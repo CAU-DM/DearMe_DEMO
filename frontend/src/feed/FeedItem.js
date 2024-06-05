@@ -2,7 +2,7 @@ import { useState, useEffect, forwardRef } from "react";
 import styles from "./Feed.module.css";
 import { BiCheck, BiEditAlt } from "react-icons/bi";
 
-const FeedItem = forwardRef(({ feedId, date, image, content }, ref) => {
+const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, ref) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
   const [img, setImg] = useState(null);
@@ -40,8 +40,12 @@ const FeedItem = forwardRef(({ feedId, date, image, content }, ref) => {
           }),
         });
         const data = await response.json();
-        if (data.status == "success")
-          window.location.reload();
+        if (data.status == "success") {
+          const updatedFeeds = feeds.map((feed) =>
+            feed.id === feedId ? { ...feed, content: editedContent } : feed
+          );
+          setFeeds(updatedFeeds);
+        }
         else
           console.error("Failed to update diary:", data);
       } catch (error) {
