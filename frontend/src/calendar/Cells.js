@@ -26,7 +26,7 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
         if (response.ok) {
           const data = await response.json();
           if (data.status === "success") {
-            setDaysWithDiaries(data.days);
+            setDaysWithDiaries(data.days.map(day => format(new Date(`${currentMonth.getFullYear()}-${month}-${day}`), 'dd')));
           }
         }
       } catch (error) {
@@ -71,8 +71,7 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
       const cloneDay = day;
       const formattedCloneDay = format(cloneDay, "yyyy-MM-dd");
       const monthDayKey = format(day, "MM-dd");
-
-      const isDiaryDay = daysWithDiaries.includes(format(day, "d"));
+      const isDiaryDay = daysWithDiaries.includes(format(day, "dd"));
 
       const dayStyle = {
         backgroundImage: datesImage[monthDayKey]
@@ -97,9 +96,8 @@ function Cells({ currentMonth, selectedDate, onDateClick }) {
           } ${isDiaryDay ? "cursor-pointer" : "cursor-default"}`}
           key={day}
           onClick={
-            // 왠지 모르겠는데 1~9일은 클릭이 안 되는 버그가 있음
             format(currentMonth, "MM") === format(day, "MM") && isDiaryDay
-              ? () => onDateClick(format(cloneDay, "yyyy-MM-dd"))
+              ? () => onDateClick(formattedCloneDay)
               : undefined
           }
           style={dayStyle}
