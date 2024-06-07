@@ -133,10 +133,21 @@ def submit_message():
     )
     messege_list_for_ai = [msg.serialize_for_ai() for msg in messege_list]
     messege_list_for_ai.append(user_message.serialize_for_ai())
-    # print(messege_list_for_ai)
+
+    all_user_message = (
+        db.Message.query.join(db.Chat, db.Message.ChatId == db.Chat.ChatId)
+        .filter(db.Chat.UId == session["UId"])
+        .filter(db.Message.Sender == db.SenderEnum.user)
+        .filter(db.Message.Message != "Generate.")
+        .all()
+    )
+    u1, u2, u3 = "", "", ""
+    if len(all_user_message) >= 3:
+        u1, u2, u3 = [msg.Message for msg in random.sample(all_user_message, 3)]
+
     response_message = db.Message(
         ChatId=session["ChatId"],
-        Message=ai.generate_chat(client, messege_list_for_ai),
+        Message=ai.generate_chat(client, messege_list_for_ai, u1, u2, u3),
         Sender=db.SenderEnum.assistant,
         Time=current_time_kst().time(),
     )
