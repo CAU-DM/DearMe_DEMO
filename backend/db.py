@@ -40,6 +40,7 @@ class SenderEnum(Enum):
     user = 0
     assistant = 1
     system = 2
+    photo = 3
 
 
 class User(db.Model):
