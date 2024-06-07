@@ -1,12 +1,28 @@
 import React, { useEffect, useRef } from 'react';
 import FeedItem from './FeedItem';
 import styles from './Feed.module.css';
+import domtoimage from 'dom-to-image-more';
+import { saveAs } from 'file-saver';
 import { parse, differenceInDays, isEqual } from 'date-fns';
 
 function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
   const randomIndex = Math.floor(Math.random() * 4);
   const imgUrl = '/img/empty_' + randomIndex + '.png';
   const feedRefs = useRef([]);
+
+  const handleDownload = async (index) => {
+    const feedRef = feedRefs.current[index];
+    if (feedRef) {
+      try {
+        const blob = await domtoimage.toBlob(feedRef);
+        saveAs(blob, 'today_diary.png');
+      } catch (error) {
+        console.error('Error capturing image:', error);
+      }
+    } else {
+      console.error('Reference to the DOM element is not available.');
+    }
+  };
 
   useEffect(() => {
     const fetchFeeds = async () => {
@@ -74,6 +90,7 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
           date={feed.created_at}
           image={feed.img_url}
           ref={(el) => (feedRefs.current[index] = el)}
+          handleDownload={() => handleDownload(index)}
         />
       ))}
     </div>
