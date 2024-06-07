@@ -113,7 +113,7 @@ def submit_message():
     )
     messege_list_for_ai = [msg.serialize_for_ai() for msg in messege_list]
     messege_list_for_ai.append(user_message.serialize_for_ai())
-    print(messege_list_for_ai)
+    # print(messege_list_for_ai)
     response_message = db.Message(
         ChatId=session["ChatId"],
         Message=ai.generate_chat(client, messege_list_for_ai),
@@ -145,9 +145,19 @@ def generate_message():
 
     chat = db.Chat.query.filter_by(ChatId=session["ChatId"]).first()
     messege_list_for_ai = [msg.serialize_for_ai() for msg in chat.Messages]
+
+    diary_list = db.Diary.query.join(db.Chat, db.Diary.ChatId == db.Chat.ChatId).filter(db.Chat.UId == session["UId"]).order_by(db.Diary.UpdatedAt.desc()).all()
+
+    print(len(diary_list))
+    d1, d2 = ai.default_diary_1, ai.default_diary_2
+    if len(diary_list) > 0:
+        d1 = diary_list[0].Content
+    if len(diary_list) > 1:
+        d2 = diary_list[1].Content
+
     response_message = db.Message(
         ChatId=session["ChatId"],
-        Message=ai.generate_diary(client, messege_list_for_ai).replace("\n", " "),
+        Message=ai.generate_diary(client, messege_list_for_ai, d1, d2).replace("\n", " "),
         Sender=db.SenderEnum.assistant,
         Time=current_time_kst().time(),
     )

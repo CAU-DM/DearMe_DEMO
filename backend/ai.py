@@ -193,7 +193,6 @@ def generate_diary(client, conversation_history, d1, d2):
     conversation_history.insert(
         0, {"role": "system", "content": generate_system_prompt}
     )
-    print("here: ", d1, d2)
     conversation_history.append({"role": "user", "content": generate_added_prompt(diary_1=d1, diary_2=d2)})
     conversation_history = trim_conversation_history(
         # conversation_history, 8_192, model, response_token
