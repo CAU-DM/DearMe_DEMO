@@ -16,6 +16,7 @@
 .feed_item {
   width: 100%;
   position: relative;
+  background-color: #ffffff;
 }
 
 .feed_item_header {
@@ -49,7 +50,6 @@
   line-height: 1.2;
 }
 
-
 textarea {
   max-width: 600px;
   width: 100%;
@@ -64,16 +64,18 @@ textarea {
   resize: vertical;
   margin-bottom: 10px;
 }
-  
+
+.saveImage_button,
 .edit_button,
 .save_button {
   padding: 10px 15px;
-  margin-left: 10px;
+  /* margin-left: 10px; */
   border: none;
   border-radius: 5px;
   cursor: pointer;
 }
 
+.saveImage_button,
 .edit_button {
   background-color: transparent;
   color: #22232c;

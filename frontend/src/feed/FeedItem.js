@@ -1,11 +1,31 @@
-import { useState, useEffect, forwardRef } from "react";
-import styles from "./Feed.module.css";
-import { BiCheck, BiEditAlt } from "react-icons/bi";
+import { useState, useEffect, forwardRef, useRef } from 'react';
+import styles from './Feed.module.css';
+import { BiCheck, BiEditAlt } from 'react-icons/bi';
+import domtoimage from 'dom-to-image-more';
+import { saveAs } from 'file-saver';
+import { FiDownload } from 'react-icons/fi';
 
 const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, ref) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
   const [img, setImg] = useState(null);
+  const [isDownload, setIsDownload] = useState(false);
+
+  const onDownloadBtn = () => {
+    // var node = document.getElementById('toImage');
+
+    domtoimage
+      .toBlob(document.querySelector('#downloadImg'))
+      // .toBlob(node)
+      .then((blob) => {
+        saveAs(blob, 'card.png');
+      })
+      .catch((error) => {
+        console.error('Error capturing image:', error);
+      });
+
+    setIsDownload(false);
+  };
 
   useEffect(() => {
     const fetchImg = async () => {
@@ -14,7 +34,7 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
         // console.log("Image URL:", imageUrl);
         setImg(imageUrl);
       } catch (error) {
-        console.error("Error fetching img:", error);
+        console.error('Error fetching img:', error);
       }
     };
 
@@ -62,9 +82,9 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getUTCFullYear();
-    const month = date.toLocaleString("default", {
-      month: "long",
-      timeZone: "UTC",
+    const month = date.toLocaleString('default', {
+      month: 'long',
+      timeZone: 'UTC',
     });
     const day = date.getUTCDate();
     return `${year}년 ${month} ${day}일`;
@@ -73,20 +93,39 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
   const formattedDate = formatDate(date);
 
   return (
-    <div className={styles.feed_item} ref={ref}>
+    <div className={styles.feed_item} ref={ref} id="downloadImg">
       <div className={styles.feed_item_header}>
-        <div className={styles.date_text}>{formattedDate}의 일기</div>
-        {isEditing ? (
-          <button onClick={handleSave} className={styles.save_button}>
-            <BiCheck size={26} />
-          </button>
-        ) : (
-          <button onClick={handleEdit} className={styles.edit_button}>
-            <BiEditAlt size={22} />
-          </button>
-        )}
+        <div className={styles.date_text} id="toImage">
+          {formattedDate}의 일기
+        </div>
+        <div>
+          {isDownload ? (
+            <> </>
+          ) : isEditing ? (
+            <button onClick={handleSave} className={styles.save_button}>
+              <BiCheck size={26} />
+            </button>
+          ) : (
+            <button onClick={handleEdit} className={styles.edit_button}>
+              <BiEditAlt size={22} />
+            </button>
+          )}
+          {isDownload ? (
+            <> </>
+          ) : (
+            <button
+              onClick={() => {
+                onDownloadBtn();
+                setIsDownload(true);
+              }}
+              className={styles.saveImage_button}
+            >
+              <FiDownload size={22} />
+            </button>
+          )}
+        </div>
       </div>
-      <img src={img} alt="Feed" />
+      <img src={img} alt="Feed" id="toImage" />
       {isEditing ? (
         <textarea
           value={editedContent}
@@ -94,7 +133,9 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
           className={styles.textarea}
         />
       ) : (
-        <p className={styles.content}>{content}</p>
+        <p className={styles.content} id="toImage">
+          {content}
+        </p>
       )}
     </div>
   );
