@@ -32,7 +32,7 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
           credentials: 'include',
         });
         const data = await response.json();
-        console.log('Feed List:', data.feedList);
+        // console.log("Feed List:", data.feedList);
         setFeeds(data.feedList);
       } catch (error) {
         console.error('Error fetching feeds:', error);
@@ -71,7 +71,7 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
           });
       }, 0);
     }
-  }, [feeds, feedDate]);
+  }, [feedDate]);
 
   return (
     <div className={styles.feed_page}>
@@ -86,10 +86,13 @@ function FeedPage({ userData, feeds, setFeeds, isGenerated, feedDate }) {
       {feeds.map((feed, index) => (
         <FeedItem
           key={feed.id}
+          feedId={feed.id}
           content={feed.content}
           date={feed.created_at}
           image={feed.img_url}
           ref={(el) => (feedRefs.current[index] = el)}
+          setFeeds={setFeeds}
+          feeds={feeds}
           handleDownload={() => handleDownload(index)}
         />
       ))}

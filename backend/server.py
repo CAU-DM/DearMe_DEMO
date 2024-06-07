@@ -7,6 +7,7 @@ import copy
 import os
 import ai
 import db
+import random
 from db import current_time_kst
 
 
@@ -75,7 +76,26 @@ def get_messages():
         default_message = db.Message(
             ChatId=chat.ChatId,
             Sender=db.SenderEnum.assistant,
-            Message="안녕? 오늘 하루는 어땠어?",
+            Message="안녕! "
+            + random.choice(
+                [
+                    "오늘 하루는 어땠어",
+                    "오늘 어떤 일이 가장 즐거웠어",
+                    "오늘 누구 만났어",
+                    "오늘 어디 갔었어",
+                    "오늘 기분 좋은 일 있었어",
+                    "오늘 무슨 일 있었어",
+                    "오늘 어떤 일로 웃었어",
+                    "오늘 힘들었던 일 있었어",
+                    "오늘 어디서 시간을 보냈어",
+                    "오늘 특별한 일이 있었어",
+                    "오늘 누구랑 이야기했어",
+                    "오늘 무슨 생각 많이 했어",
+                    "오늘 날씨 어땠어",
+                    "오늘 기분 좋을만한 일이 있었어",
+                ]
+            )
+            + random.choice(["?", "?!", "??"]),
             Time=current_time_kst().time(),
         )
         db.db.session.add(default_message)
@@ -113,10 +133,21 @@ def submit_message():
     )
     messege_list_for_ai = [msg.serialize_for_ai() for msg in messege_list]
     messege_list_for_ai.append(user_message.serialize_for_ai())
-    print(messege_list_for_ai)
+
+    all_user_message = (
+        db.Message.query.join(db.Chat, db.Message.ChatId == db.Chat.ChatId)
+        .filter(db.Chat.UId == session["UId"])
+        .filter(db.Message.Sender == db.SenderEnum.user)
+        .filter(db.Message.Message != "Generate.")
+        .all()
+    )
+    u1, u2, u3 = "", "", ""
+    if len(all_user_message) >= 3:
+        u1, u2, u3 = [msg.Message for msg in random.sample(all_user_message, 3)]
+
     response_message = db.Message(
         ChatId=session["ChatId"],
-        Message=ai.generate_chat(client, messege_list_for_ai),
+        Message=ai.generate_chat(client, messege_list_for_ai, u1, u2, u3),
         Sender=db.SenderEnum.assistant,
         Time=current_time_kst().time(),
     )
@@ -145,9 +176,26 @@ def generate_message():
 
     chat = db.Chat.query.filter_by(ChatId=session["ChatId"]).first()
     messege_list_for_ai = [msg.serialize_for_ai() for msg in chat.Messages]
+
+    diary_list = (
+        db.Diary.query.join(db.Chat, db.Diary.ChatId == db.Chat.ChatId)
+        .filter(db.Chat.UId == session["UId"])
+        .order_by(db.Diary.UpdatedAt.desc())
+        .all()
+    )
+
+    # print(len(diary_list))
+    d1, d2 = ai.default_diary_1, ai.default_diary_2
+    if len(diary_list) > 0:
+        d1 = diary_list[0].Content
+    if len(diary_list) > 1:
+        d2 = diary_list[1].Content
+
     response_message = db.Message(
         ChatId=session["ChatId"],
-        Message=ai.generate_diary(client, messege_list_for_ai),
+        Message=ai.generate_diary(client, messege_list_for_ai, d1, d2).replace(
+            "\n", " "
+        ),
         Sender=db.SenderEnum.assistant,
         Time=current_time_kst().time(),
     )
@@ -230,6 +278,20 @@ def submit_photo():
         return jsonify({"status": "success"})
     else:
         return jsonify({"status": "error", "message": "Invalid file type."})
+
+
+@app.route("/modify_diary/<path:diaryId>", methods=["PUT"])
+def modify_diary(diaryId):
+    if "UId" not in session:
+        return jsonify({"status": "error", "message": "User not logged in."})
+
+    request_data = request.get_json()
+    diary = db.Diary.query.filter_by(DiaryId=diaryId).first()
+    if diary is None:
+        return jsonify({"status": "error", "message": "Diary not found."})
+    diary.Content = request_data["content"].replace("\n", " ")
+    db.db.session.commit()
+    return jsonify({"status": "success"})
 
 
 @app.route("/get_feeds", methods=["GET"])

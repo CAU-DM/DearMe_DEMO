@@ -3,7 +3,7 @@ import styles from './Feed.module.css';
 import { BiCheck, BiEditAlt } from 'react-icons/bi';
 import { FiDownload } from 'react-icons/fi';
 
-const FeedItem = forwardRef(({ date, image, content, handleDownload }, ref) => {
+const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, setFeeds, feeds }, ref) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
   const [img, setImg] = useState(null);
@@ -19,7 +19,7 @@ const FeedItem = forwardRef(({ date, image, content, handleDownload }, ref) => {
     const fetchImg = async () => {
       try {
         const imageUrl = `/get_feeds/${image}`;
-        console.log('Image URL:', imageUrl);
+        // console.log("Image URL:", imageUrl);
         setImg(imageUrl);
       } catch (error) {
         console.error('Error fetching img:', error);
@@ -35,11 +35,39 @@ const FeedItem = forwardRef(({ date, image, content, handleDownload }, ref) => {
 
   const handleSave = () => {
     setIsEditing(false);
+    const fetchDiaryUpdate = async () => {
+      try {
+        // console.log("Editing diary:", feedId, editedContent);
+        if (editedContent.length > 600)
+          throw new Error("Content is too long");
+        const response = await fetch(`/modify_diary/${feedId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            content: editedContent,
+          }),
+        });
+        const data = await response.json();
+        if (data.status == "success") {
+          const updatedFeeds = feeds.map((feed) =>
+            feed.id === feedId ? { ...feed, content: editedContent } : feed
+          );
+          setFeeds(updatedFeeds);
+        }
+        else
+          console.error("Failed to update diary:", data);
+      } catch (error) {
+        alert("일기가 너무 길어요! 600자 이내로 작성해주세요.");
+        console.error("Error updating diary:", error);
+      }
+    }
+    fetchDiaryUpdate();
   };
 
   const handleInputChange = (e) => {
     setEditedContent(e.target.value);
-    content = editedContent;
   };
 
   const formatDate = (dateString) => {

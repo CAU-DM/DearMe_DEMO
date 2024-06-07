@@ -10,6 +10,8 @@ myenv
 nohup.out
 backend/uploads
 
+yarn.lock
+
 # Distribution / packaging
 .Python
 build/
