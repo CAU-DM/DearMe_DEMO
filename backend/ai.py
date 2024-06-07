@@ -44,6 +44,7 @@ Any dialogue not pertaining to today's occurrences or emotions should be meticul
 This ensures the diary remains focused and relevant to the day's experiences and feelings, honoring the integrity of a true daily record.
 It shouldn't be written as if the user is speaking to someone else. Keep in mind that it's a diary.
 Your purpose is to write a diary for “user”. The dialog with “assistant” is to elicit the contents of user's diary. The assistant's lines should not go into the diary.
+You should never write a diary based on the contents of an example of a generated diary. This is just an example of a diary.
 ```
 [Example of Gerenated Diary]
 ```
