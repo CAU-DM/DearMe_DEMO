@@ -7,6 +7,7 @@ import copy
 import os
 import ai
 import db
+import random
 from db import current_time_kst
 
 
@@ -75,7 +76,26 @@ def get_messages():
         default_message = db.Message(
             ChatId=chat.ChatId,
             Sender=db.SenderEnum.assistant,
-            Message="안녕? 오늘 하루는 어땠어?",
+            Message="안녕! "
+            + random.choice(
+                [
+                    "오늘 하루는 어땠어",
+                    "오늘 어떤 일이 가장 즐거웠어",
+                    "오늘 누구 만났어",
+                    "오늘 어디 갔었어",
+                    "오늘 기분 좋은 일 있었어",
+                    "오늘 무슨 일 있었어",
+                    "오늘 어떤 일로 웃었어",
+                    "오늘 힘들었던 일 있었어",
+                    "오늘 어디서 시간을 보냈어",
+                    "오늘 특별한 일이 있었어",
+                    "오늘 누구랑 이야기했어",
+                    "오늘 무슨 생각 많이 했어",
+                    "오늘 날씨 어땠어",
+                    "오늘 기분 좋을만한 일이 있었어",
+                ]
+            )
+            + random.choice(["?", "?!", "??"]),
             Time=current_time_kst().time(),
         )
         db.db.session.add(default_message)
@@ -146,7 +166,12 @@ def generate_message():
     chat = db.Chat.query.filter_by(ChatId=session["ChatId"]).first()
     messege_list_for_ai = [msg.serialize_for_ai() for msg in chat.Messages]
 
-    diary_list = db.Diary.query.join(db.Chat, db.Diary.ChatId == db.Chat.ChatId).filter(db.Chat.UId == session["UId"]).order_by(db.Diary.UpdatedAt.desc()).all()
+    diary_list = (
+        db.Diary.query.join(db.Chat, db.Diary.ChatId == db.Chat.ChatId)
+        .filter(db.Chat.UId == session["UId"])
+        .order_by(db.Diary.UpdatedAt.desc())
+        .all()
+    )
 
     # print(len(diary_list))
     d1, d2 = ai.default_diary_1, ai.default_diary_2
@@ -157,7 +182,9 @@ def generate_message():
 
     response_message = db.Message(
         ChatId=session["ChatId"],
-        Message=ai.generate_diary(client, messege_list_for_ai, d1, d2).replace("\n", " "),
+        Message=ai.generate_diary(client, messege_list_for_ai, d1, d2).replace(
+            "\n", " "
+        ),
         Sender=db.SenderEnum.assistant,
         Time=current_time_kst().time(),
     )
