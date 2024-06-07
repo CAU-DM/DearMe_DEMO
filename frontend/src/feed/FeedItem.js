@@ -50,6 +50,8 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
     const fetchDiaryUpdate = async () => {
       try {
         // console.log("Editing diary:", feedId, editedContent);
+        if (editedContent.length > 600)
+          throw new Error("Content is too long");
         const response = await fetch(`/modify_diary/${feedId}`, {
           method: "PUT",
           headers: {
@@ -69,6 +71,7 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
         else
           console.error("Failed to update diary:", data);
       } catch (error) {
+        alert("일기가 너무 길어요! 600자 이내로 작성해주세요.");
         console.error("Error updating diary:", error);
       }
     }
