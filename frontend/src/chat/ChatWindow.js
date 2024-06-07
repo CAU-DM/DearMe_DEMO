@@ -17,6 +17,7 @@ function getTimeString() {
 function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [chatStatus, setChatStatus] = useState(0);
   const [genButtonKey, setGenButtonKey] = useState(0);
   const [imgFile, setImgFile] = useState(null);
   const chatEndRef = useRef(null);
@@ -36,6 +37,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
       })
       .then((data) => {
         setMessages(data.messages);
+        setChatStatus(data.chatStatus);
       });
   }, []);
 
@@ -69,7 +71,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   };
 
   const handleSendClick = () => {
-    if (!isLoading && !isGenerated) {
+    if (!isLoading && !isGenerated && chatStatus != 2) {
       let content = inputText.trim();
 
       if (content) {
@@ -109,6 +111,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
                   time: getTimeString(),
                 },
               ]);
+              setChatStatus(data.chatStatus);
             }
             setIsLoading(false);
           })
@@ -276,7 +279,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         })}
         <div ref={chatEndRef}></div>
       </div>
-      {messages.length > 6 && !isLoading && !isGenerated ? (
+      {chatStatus == 1 && !isLoading && !isGenerated ? (
         <div className={styles.gen_button_container}>
           <div
             onClick={() => {
@@ -291,7 +294,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
         <></>
       )}
       <div className={styles.input_area}>
-        {!isGenerated || imgFile == null ? (
+        {imgFile == null ? (
           <>
             <input
               ref={inputRef}
