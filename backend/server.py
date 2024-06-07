@@ -148,7 +148,7 @@ def generate_message():
 
     diary_list = db.Diary.query.join(db.Chat, db.Diary.ChatId == db.Chat.ChatId).filter(db.Chat.UId == session["UId"]).order_by(db.Diary.UpdatedAt.desc()).all()
 
-    print(len(diary_list))
+    # print(len(diary_list))
     d1, d2 = ai.default_diary_1, ai.default_diary_2
     if len(diary_list) > 0:
         d1 = diary_list[0].Content
