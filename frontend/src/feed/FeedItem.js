@@ -1,29 +1,17 @@
 import { useState, useEffect, forwardRef, useRef } from 'react';
 import styles from './Feed.module.css';
 import { BiCheck, BiEditAlt } from 'react-icons/bi';
-import domtoimage from 'dom-to-image-more';
-import { saveAs } from 'file-saver';
 import { FiDownload } from 'react-icons/fi';
 
-const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, ref) => {
+const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, setFeeds, feeds }, ref) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
   const [img, setImg] = useState(null);
   const [isDownload, setIsDownload] = useState(false);
 
-  const onDownloadBtn = () => {
-    // var node = document.getElementById('toImage');
-
-    domtoimage
-      .toBlob(document.querySelector('#downloadImg'))
-      // .toBlob(node)
-      .then((blob) => {
-        saveAs(blob, 'card.png');
-      })
-      .catch((error) => {
-        console.error('Error capturing image:', error);
-      });
-
+  const onDownloadBtn = async () => {
+    setIsDownload(true);
+    await handleDownload();
     setIsDownload(false);
   };
 
@@ -98,9 +86,7 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
   return (
     <div className={styles.feed_item} ref={ref} id="downloadImg">
       <div className={styles.feed_item_header}>
-        <div className={styles.date_text} id="toImage">
-          {formattedDate}의 일기
-        </div>
+        <div className={styles.date_text}>{formattedDate}의 일기</div>
         <div>
           {isDownload ? (
             <> </>
@@ -119,7 +105,6 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
             <button
               onClick={() => {
                 onDownloadBtn();
-                setIsDownload(true);
               }}
               className={styles.saveImage_button}
             >
@@ -128,7 +113,7 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
           )}
         </div>
       </div>
-      <img src={img} alt="Feed" id="toImage" />
+      <img src={img} alt="Feed" />
       {isEditing ? (
         <textarea
           value={editedContent}
@@ -136,9 +121,7 @@ const FeedItem = forwardRef(({ feedId, date, image, content, setFeeds, feeds }, 
           className={styles.textarea}
         />
       ) : (
-        <p className={styles.content} id="toImage">
-          {content}
-        </p>
+        <p className={styles.content}>{content}</p>
       )}
     </div>
   );
