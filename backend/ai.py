@@ -23,6 +23,7 @@ default_diary_3 = """
 시간가는줄 모르고 이야기했다. 맥주 한잔에 얼굴 빨개진 혜윤이 너무 귀여웠다. 매머드 인연들 넘 소즁해
 """
 
+
 def generate_added_prompt(
     diary_1=default_diary_1, diary_2=default_diary_2, diary_3=default_diary_3
 ):
@@ -59,13 +60,29 @@ Example3: {diary_3}
 - example : "했다" instead of "했어" / "없었어" instead of "없었어요" / "좋았다" instead of "좋았어"
 """
 
+
 generate_system_prompt = """
 Your purpose is to create a diary for the user.
 You need to create a diary for the user based on the conversations you've had.
 """
 
-dialog_system_prompt = """
-You are the user's doppelganger, creating a diary of the day through conversation.
+
+def u_example(u1, u2, u3):
+    s = "\n\nYou should follow the tone and feel of these sentences above, not the exact words, when generating prompts.\n[Example User Sentences]\n"
+    if u1 and u2 and u3:
+        if u1:
+            s += f"1. User: {u1}\n"
+        if u2:
+            s += f"2. User: {u2}\n"
+        if u3:
+            s += f"3. User: {u3}"
+        return s
+    return ""
+
+
+def dialog_system_prompt(u_example):
+    return (
+        f"""You are the user's doppelganger, creating a diary of the day through conversation.
 Mimic the tone and style of the user's chat, using informal language and casual speech.
 Your task is to ask about the user's day and their emotions, but avoid forcing the conversation about emotions if it doesn't flow naturally.
 Redirect off-topic prompts back to discussions about the user's day.
@@ -95,6 +112,9 @@ At the end of one topic, ask questions to smoothly transition to another.
 5. User: "오늘 여자친구와 데이트를 했어."
    AI: "정말 멋진 하루였겠네! 데이트 중 가장 좋았던 순간은 뭐였어?"
 """
+        + u_example
+    )
+
 
 gpt3_encoding = tiktoken.encoding_for_model("gpt-3.5-turbo-0613")
 gpt4_encoding = tiktoken.encoding_for_model("gpt-4-0613")
@@ -169,10 +189,12 @@ def create_openai_client():
     return openai.OpenAI(api_key=os.getenv("GPT_API_KEY"))
 
 
-def generate_chat(client, conversation_history):
+def generate_chat(client, conversation_history, u1, u2, u3):
     model = "gpt-3.5-turbo-0613"
     response_token = 500
-    conversation_history.insert(0, {"role": "system", "content": dialog_system_prompt})
+    conversation_history.insert(
+        0, {"role": "system", "content": dialog_system_prompt(u_example(u1, u2, u3))}
+    )
     conversation_history = trim_conversation_history(
         conversation_history, 4_096, model, response_token
     )
@@ -193,7 +215,9 @@ def generate_diary(client, conversation_history, d1, d2):
     conversation_history.insert(
         0, {"role": "system", "content": generate_system_prompt}
     )
-    conversation_history.append({"role": "user", "content": generate_added_prompt(diary_1=d1, diary_2=d2)})
+    conversation_history.append(
+        {"role": "user", "content": generate_added_prompt(diary_1=d1, diary_2=d2)}
+    )
     conversation_history = trim_conversation_history(
         # conversation_history, 8_192, model, response_token
         conversation_history,
