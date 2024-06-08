@@ -11,6 +11,7 @@
   align-content: center;
   align-items: center;
   justify-content: start;
+  padding: 0 81px;
 }
 
 .feed_item {
@@ -24,19 +25,25 @@
   height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
+  margin-bottom: 12px;
 }
 
 .feed_item p {
-  padding: 12px 16px;
+  padding: 0 8px 4px 8px;
   font-size: medium;
   letter-spacing: 0.025em;
   line-height: 1.4;
 }
 
+.feed_item button {
+  padding: 4px 6px;
+  color:#959595;
+}
+
 .item_divider {
-  margin: 8px 4px 0 4px;
-  padding-bottom: 8px;
-  border-top: 1px solid #e3e3e3;
+  margin: 12px 4px 0 4px;
+  padding-bottom: 12px;
+  border-top: 1.5px solid #ccc;
 }
 
 textarea {

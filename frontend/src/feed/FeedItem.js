@@ -90,21 +90,22 @@ const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, set
           className={styles.textarea}
         />
       ) : (
-        <p>
-          <strong>{formattedDate}</strong>{content}
-        </p>
+        <div>
+          <p><strong style={{ fontSize: "20px" }}>{formattedDate}</strong></p>
+          <p>{content}</p>
+        </div>
       )}
       <div>
           {isDownload ? (
             <> </>
           ) : isEditing ? (
             <button onClick={handleSave} className={styles.save_button}>
-              <BiCheck size={18} />
+              <BiCheck size={20} />
             </button>
           ) : (
             <div>
               <button onClick={handleEdit} className={styles.edit_button}>
-                <BiEditAlt size={16} />
+                <BiEditAlt size={18} />
               </button>
               <button
                 onClick={() => {
@@ -112,7 +113,7 @@ const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, set
                 }}
                 className={styles.saveImage_button}
               >
-                <FiDownload size={16} />
+                <FiDownload size={18} />
               </button>
             </div>
           )}
