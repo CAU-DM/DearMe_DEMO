@@ -103,7 +103,7 @@ const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, set
               <BiCheck size={20} />
             </button>
           ) : (
-            <div>
+            <div className={styles.button_conatiner}>
               <button onClick={handleEdit} className={styles.edit_button}>
                 <BiEditAlt size={18} />
               </button>
