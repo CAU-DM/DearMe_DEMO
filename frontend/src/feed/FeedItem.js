@@ -85,6 +85,7 @@ const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, set
 
   return (
     <div className={styles.feed_item} ref={ref} id="downloadImg">
+      <img src={img} alt="Feed" />
       <div className={styles.feed_item_header}>
         <div className={styles.date_text}>{formattedDate}의 일기</div>
         <div>
@@ -113,7 +114,6 @@ const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, set
           )}
         </div>
       </div>
-      <img src={img} alt="Feed" />
       {isEditing ? (
         <textarea
           value={editedContent}
