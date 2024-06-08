@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 
-function PhotoDrop({ file, setFile }) {
+function PhotoDrop({ file, setFile, chatEndRef }) {
   const [error, setError] = useState(null);
 
   const onDrop = useCallback((acceptedFiles) => {
