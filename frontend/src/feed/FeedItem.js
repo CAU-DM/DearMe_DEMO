@@ -121,8 +121,9 @@ const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, set
           className={styles.textarea}
         />
       ) : (
-        <p className={styles.content}>{content}</p>
+        <p>{content}</p>
       )}
+      {!isDownload && <div className={styles.item_divider}></div>}
     </div>
   );
 });
