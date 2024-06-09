@@ -73,46 +73,15 @@ const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, set
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getUTCFullYear();
-    const month = date.toLocaleString('default', {
-      month: 'long',
-      timeZone: 'UTC',
-    });
-    const day = date.getUTCDate();
-    return `${year}년 ${month} ${day}일`;
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${year}.${month}.${day} `;
   };
 
   const formattedDate = formatDate(date);
 
   return (
     <div className={styles.feed_item} ref={ref} id="downloadImg">
-      <div className={styles.feed_item_header}>
-        <div className={styles.date_text}>{formattedDate}의 일기</div>
-        <div>
-          {isDownload ? (
-            <> </>
-          ) : isEditing ? (
-            <button onClick={handleSave} className={styles.save_button}>
-              <BiCheck size={26} />
-            </button>
-          ) : (
-            <button onClick={handleEdit} className={styles.edit_button}>
-              <BiEditAlt size={22} />
-            </button>
-          )}
-          {isDownload ? (
-            <> </>
-          ) : (
-            <button
-              onClick={() => {
-                onDownloadBtn();
-              }}
-              className={styles.saveImage_button}
-            >
-              <FiDownload size={22} />
-            </button>
-          )}
-        </div>
-      </div>
       <img src={img} alt="Feed" />
       {isEditing ? (
         <textarea
@@ -121,8 +90,35 @@ const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, set
           className={styles.textarea}
         />
       ) : (
-        <p className={styles.content}>{content}</p>
+        <div>
+          <p><strong style={{ fontSize: "20px" }}>{formattedDate}</strong></p>
+          <p>{content}</p>
+        </div>
       )}
+      <div>
+          {isDownload ? (
+            <> </>
+          ) : isEditing ? (
+            <button onClick={handleSave} className={styles.save_button}>
+              <BiCheck size={20} />
+            </button>
+          ) : (
+            <div>
+              <button onClick={handleEdit} className={styles.edit_button}>
+                <BiEditAlt size={18} />
+              </button>
+              <button
+                onClick={() => {
+                  onDownloadBtn();
+                }}
+                className={styles.saveImage_button}
+              >
+                <FiDownload size={18} />
+              </button>
+            </div>
+          )}
+        </div>
+      {!isDownload && <div className={styles.item_divider}></div>}
     </div>
   );
 });

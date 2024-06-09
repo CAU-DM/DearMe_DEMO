@@ -11,6 +11,7 @@
   align-content: center;
   align-items: center;
   justify-content: start;
+  padding: 0 81px;
 }
 
 .feed_item {
@@ -19,35 +20,31 @@
   background-color: #ffffff;
 }
 
-.feed_item_header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  align-content: center;
-}
-
-.date_text {
-  height: 60px;
-  align-content: center;
-  margin-left: 16px;
-  font-size: large;
-  font-weight: 900;
-}
-
 .feed_item img {
   width: 100%;
   height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
+  margin-bottom: 12px;
+  border-radius: 4px;
 }
 
 .feed_item p {
-  padding: 8px;
-  margin-bottom: 16px;
+  padding: 0 8px 4px 8px;
   font-size: medium;
   letter-spacing: 0.025em;
-  line-height: 1.2;
+  line-height: 1.4;
+}
+
+.feed_item button {
+  padding: 4px 6px;
+  color:#959595;
+}
+
+.item_divider {
+  margin: 12px 4px 0 4px;
+  padding-bottom: 12px;
+  border-top: 1.5px solid #ccc;
 }
 
 textarea {
@@ -84,4 +81,10 @@ textarea {
 .save_button {
   background-color: transparent;
   color: #22232c;
+}
+
+@media (max-width: 1080px) {
+  .feed_page {
+    padding: 0;
+  }
 }
