@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import PhotoDrop from './PhotoDrop';
 import { IoIosSend } from 'react-icons/io';
-import { FaCircleCheck } from 'react-icons/fa6';
+import TextareaAutosize from 'react-textarea-autosize';
 import styles from './Chat.module.css';
 
 function getTimeString() {
@@ -76,6 +76,9 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
       handleSendClick();
+    }
+    if (event.key === 'Enter' && event.target === event.currentTarget) {
+      event.preventDefault();
     }
   };
 
@@ -305,13 +308,15 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
       <div className={styles.input_area}>
         {imgFile == null ? (
           <>
-            <input
+            <TextareaAutosize
               ref={inputRef}
               value={inputText}
               onInput={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
               maxLength={300}
+              minRows={1}
+              maxRows={4}
             />
             <i onClick={handleSendClick}>
               <IoIosSend size={32} />
