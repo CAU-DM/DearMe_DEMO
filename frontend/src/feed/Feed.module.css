@@ -47,18 +47,15 @@
   border-top: 1.5px solid #ccc;
 }
 
-textarea {
+.textarea {
   max-width: 600px;
   width: 100%;
-  height: 100px;
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  font-size: medium;
-  line-height: 1.2;
+  border-radius: 5px;font-size: medium;
+  line-height: 1.4;
   letter-spacing: 0.025em;
-  resize: vertical;
+  resize: none;
   margin-bottom: 10px;
 }
 
