@@ -187,6 +187,9 @@ def trim_conversation_history(history, max_tokens, model, response_token):
 
 
 def create_openai_client():
+    global client
+    if client:
+        return client
     load_dotenv()
     return openai.OpenAI(api_key=os.getenv("GPT_API_KEY"))
 
@@ -235,3 +238,6 @@ def generate_diary(client, conversation_history, d1, d2):
         temperature=0.7,
     )
     return response.choices[0].message.content.strip()
+
+
+client = create_openai_client()
