@@ -2,6 +2,7 @@ import { useState, useEffect, forwardRef, useRef } from 'react';
 import styles from './Feed.module.css';
 import { BiCheck, BiEditAlt } from 'react-icons/bi';
 import { FiDownload } from 'react-icons/fi';
+import TextareaAutosize from 'react-textarea-autosize';
 
 const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, setFeeds, feeds }, ref) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -84,10 +85,11 @@ const FeedItem = forwardRef(({ feedId, date, image, content, handleDownload, set
     <div className={styles.feed_item} ref={ref} id="downloadImg">
       <img src={img} alt="Feed" />
       {isEditing ? (
-        <textarea
+        <TextareaAutosize
           value={editedContent}
           onChange={handleInputChange}
           className={styles.textarea}
+          maxRows={15}
         />
       ) : (
         <div>
