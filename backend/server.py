@@ -2,13 +2,13 @@ from flask import Flask, request, jsonify, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.utils import secure_filename
-import json
-import copy
 import os
 import ai
+import moderation as md
 import db
 import random
 from db import current_time_kst
+from ai import client
 
 
 MIN_MESSAGE_NUM = 6
@@ -354,7 +354,6 @@ def get_feeds_by_date(month, day):
 
 
 if __name__ == "__main__":
-    client = ai.create_openai_client()
     app.run(
         host=os.getenv("SERVER_INTERNAL_IP"),
         port=int(os.getenv("SERVER_PORT_NUMBER")),
