@@ -210,6 +210,51 @@
   animation: scale_up 0.2s forwards;
 }
 
+.post_button {
+    width: 50%;
+    height: 35px;
+    margin-top: 4px;
+    border-radius: 10em;
+  
+    position: relative;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    overflow: hidden;
+    cursor: pointer;
+  }
+  
+  .post_button::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 650%;
+    background: linear-gradient(#ff9393, #bac0ff);
+    animation: spin 2s infinite linear;
+  }
+  
+  .post_button::after {
+    content: '✉️ Post to Feed 📮';
+    position: absolute;
+    background-color: white;
+    width: 97%;
+    height: 82%;
+    border-radius: 10em;
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 600;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .post_button:hover {
+    animation: scale_up 0.2s forwards;
+  }
+
 @keyframes spin {
   to {
     transform: rotate(360deg);

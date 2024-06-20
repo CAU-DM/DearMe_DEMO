@@ -45,8 +45,17 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-    // console.log(messages);
   }, [messages]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100); 
+
+    return () => clearTimeout(timer);
+  }, [imgFile]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -199,7 +208,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
 
     const mimeType = imgFile.split(',')[0].split(':')[1].split(';')[0];
     const blob = base64ToBlob(imgFile, mimeType);
-    const fileName = `image_${Date.now()}.png`; // You can change the file extension based on mimeType if necessary
+    const fileName = `image_${Date.now()}.png`;
 
     const formData = new FormData();
     formData.append('file', new File([blob], fileName, { type: mimeType }));
@@ -245,7 +254,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
           if (message.role === 'photo') {
             return (
               <div className={styles.message_assistant}>
-                <PhotoDrop key={index} file={imgFile} setFile={setImgFile} />
+                <PhotoDrop key={index} file={imgFile} setFile={setImgFile} chatEndRef={chatEndRef}/>
               </div>
             );
           } else {
@@ -309,9 +318,14 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
             </i>
           </>
         ) : (
-          <i onClick={handleCheckClick}>
-            <FaCircleCheck size={32} color="green" />
-          </i>
+          <div className={styles.gen_button_container}>
+            <div
+              onClick={() => {
+                handleCheckClick();
+              }}
+              className={styles.post_button}
+            ></div>
+          </div>
         )}
       </div>
     </div>
