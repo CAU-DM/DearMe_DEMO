@@ -6,9 +6,9 @@ import asyncio
 translator = None
 
 
-def translate_text(text, target_lang):
+def moderation_task(text, target_lang):
     translation = translator.translate_text(text, target_lang=target_lang)
-    return translation.text
+    return create_moderation(translation.text)
 
 
 def create_moderation(text):
@@ -24,18 +24,13 @@ async def moderation(messege_list_for_ai, u1, u2, u3):
     gen_content_task = loop.run_in_executor(
         None, ai.generate_chat, messege_list_for_ai, u1, u2, u3
     )
-    en_translation_task = loop.run_in_executor(None, translate_text, text, "EN-US")
-    fr_translation_task = loop.run_in_executor(None, translate_text, text, "FR")
+    en_moderation_task = loop.run_in_executor(None, moderation_task, text, "EN-US")
+    fr_moderation_task = loop.run_in_executor(None, moderation_task, text, "FR")
 
-    en_text, fr_text, gen_content = await asyncio.gather(
-        en_translation_task, fr_translation_task, gen_content_task
+    en_flag, fr_flag, gen_content = await asyncio.gather(
+        en_moderation_task, fr_moderation_task, gen_content_task
     )
 
-    # AI 모델 요청을 동시에 수행
-    en_response_task = loop.run_in_executor(None, create_moderation, en_text)
-    fr_response_task = loop.run_in_executor(None, create_moderation, fr_text)
-
-    en_flag, fr_flag = await asyncio.gather(en_response_task, fr_response_task)
     if en_flag | fr_flag:
         return None
     return gen_content
