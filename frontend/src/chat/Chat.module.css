@@ -99,6 +99,22 @@
   color: black;
 }
 
+.message_moderation {
+  display: inline-flex;
+  max-width: 70%;
+  padding: 12px 20px;
+  margin: 5px 0;
+  word-break: break-all;
+  justify-content: flex-start;
+  width: fit-content;
+  align-self: flex-end;
+  border-radius: 15px 0px 15px 15px;
+  background-color: #e05349;
+  color: black;
+  text-decoration: line-through;
+}
+
+
 .input_area {
   box-sizing: border-box;
   flex-basis: 4rem;
