@@ -188,13 +188,14 @@ def trim_conversation_history(history, max_tokens, model, response_token):
 
 def create_openai_client():
     global client
-    if client:
+    if client != 0:
         return client
     load_dotenv()
-    return openai.OpenAI(api_key=os.getenv("GPT_API_KEY"))
+    client = openai.OpenAI(api_key=os.getenv("GPT_API_KEY"))
 
 
-def generate_chat(client, conversation_history, u1, u2, u3):
+def generate_chat(conversation_history, u1, u2, u3):
+    global client
     model = "gpt-3.5-turbo-0613"
     response_token = 500
     conversation_history.insert(
@@ -213,7 +214,8 @@ def generate_chat(client, conversation_history, u1, u2, u3):
     return response.choices[0].message.content.strip()
 
 
-def generate_diary(client, conversation_history, d1, d2):
+def generate_diary(conversation_history, d1, d2):
+    global client
     # model = "gpt-4-0613"
     model = "gpt-3.5-turbo-0613"
     response_token = 1_500
@@ -240,4 +242,5 @@ def generate_diary(client, conversation_history, d1, d2):
     return response.choices[0].message.content.strip()
 
 
-client = create_openai_client()
+client = 0
+create_openai_client()
