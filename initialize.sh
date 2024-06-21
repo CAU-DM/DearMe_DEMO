@@ -4,6 +4,7 @@ git update-index --assume-unchanged initialize.sh
 
 # 환경 변수 설정
 GPT_API_KEY="{FILL}"
+DEEPL_API_KEY="{FILL}"
 SERVER_INTERNAL_IP="{FILL}"
 SERVER_PORT_NUMBER="{FILL}"
 export SQLITE_WEB_PASSWORD="{FILL}"
@@ -29,6 +30,7 @@ cd ..
 
 # 환경변수를 백엔드 .env 파일에 저장
 echo "GPT_API_KEY=${GPT_API_KEY}
+DEEPL_API_KEY=${DEEPL_API_KEY}
 SERVER_INTERNAL_IP=${SERVER_INTERNAL_IP}
 SERVER_PORT_NUMBER=${SERVER_PORT_NUMBER}" > ./backend/.env
 
