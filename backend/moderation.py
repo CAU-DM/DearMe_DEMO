@@ -37,8 +37,8 @@ async def moderation(messege_list_for_ai, u1, u2, u3):
 
     en_flag, fr_flag = await asyncio.gather(en_response_task, fr_response_task)
     if en_flag | fr_flag:
-        return gen_content
-    return None
+        return None
+    return gen_content
 
 
 def init():
