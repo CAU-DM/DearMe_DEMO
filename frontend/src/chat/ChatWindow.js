@@ -52,7 +52,7 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
       if (chatEndRef.current) {
         chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
       }
-    }, 100); 
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [imgFile]);
@@ -124,6 +124,17 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
                 },
               ]);
               setChatStatus(data.chatStatus);
+            }
+            else if (data.status === 'moderation') {
+              setMessages((messages) => {
+                const updatedMessages = [...messages];
+                updatedMessages[updatedMessages.length - 1] = {
+                  ...updatedMessages[updatedMessages.length - 1],
+                  flag: 'moderation',
+                };
+                setChatStatus(data.chatStatus);
+                return updatedMessages;
+              });
             }
             setIsLoading(false);
           })
@@ -257,14 +268,18 @@ function ChatWindow({ messages, setMessages, isGenerated, setIsGenerated }) {
           if (message.role === 'photo') {
             return (
               <div className={styles.message_assistant}>
-                <PhotoDrop key={index} file={imgFile} setFile={setImgFile} chatEndRef={chatEndRef}/>
+                <PhotoDrop key={index} file={imgFile} setFile={setImgFile} chatEndRef={chatEndRef} />
               </div>
             );
           } else {
             let messageClass =
-              message.role === 'user'
-                ? styles.message_user
-                : styles.message_assistant;
+              message.flag === 'moderation'
+                ? styles.message_moderation
+                : message.role === 'user'
+                  ? styles.message_user
+                  : message.role === 'assistant'
+                    ? styles.message_assistant
+                    : '';
             if (message.role === 'user' || message.role === 'assistant') {
               let timeNow = message.time.slice(0, -3);
               return (
