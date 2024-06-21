@@ -2,12 +2,12 @@ from flask import Flask, request, jsonify, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.utils import secure_filename
-import json
-import copy
 import os
 import ai
+import moderation as md
 import db
 import random
+import asyncio
 from db import current_time_kst
 
 
@@ -57,8 +57,6 @@ def login_success():
 
 @app.route("/get_messages", methods=["GET"])
 def get_messages():
-    global client
-
     if "UId" not in session:
         return jsonify({"status": "error", "message": "User not logged in."})
 
@@ -118,21 +116,20 @@ def get_messages():
 
 @app.route("/submit_message", methods=["POST"])
 def submit_message():
-    global client
-
+    # start_time = datetime.now()
     if "UId" not in session:
         return jsonify({"status": "error", "message": "User not logged in."})
 
     chat = db.Chat.query.filter_by(ChatId=session["ChatId"]).first()
-    messege_list = chat.Messages
+    message_list = chat.Messages
     user_message = db.Message(
         ChatId=session["ChatId"],
         Message=request.get_json()["message"],
         Sender=db.SenderEnum.user,
         Time=current_time_kst().time(),
     )
-    messege_list_for_ai = [msg.serialize_for_ai() for msg in messege_list]
-    messege_list_for_ai.append(user_message.serialize_for_ai())
+    message_list_for_ai = [msg.serialize_for_ai() for msg in message_list]
+    message_list_for_ai.append(user_message.serialize_for_ai())
 
     all_user_message = (
         db.Message.query.join(db.Chat, db.Message.ChatId == db.Chat.ChatId)
@@ -145,37 +142,47 @@ def submit_message():
     if len(all_user_message) >= 3:
         u1, u2, u3 = [msg.Message for msg in random.sample(all_user_message, 3)]
 
+    # start_moderation_time = datetime.now()
+    gen_content = asyncio.run(md.moderation(message_list_for_ai, u1, u2, u3))
+    # print("Moderation Time:", datetime.now() - start_moderation_time)
+
+    if gen_content is None:
+        return jsonify(
+            {
+                "status": "moderation",
+                "message": "Your message has been flagged for moderation. Please try again.",
+                "chatStatus": 0,
+            }
+        )
+
     response_message = db.Message(
         ChatId=session["ChatId"],
-        Message=ai.generate_chat(client, messege_list_for_ai, u1, u2, u3),
+        Message=gen_content,
         Sender=db.SenderEnum.assistant,
         Time=current_time_kst().time(),
     )
     db.db.session.add(user_message)
     db.db.session.add(response_message)
     db.db.session.commit()
-    chatStatus = 0
-    if len(messege_list) + 2 >= MIN_MESSAGE_NUM:
-        chatStatus = 1
+    # print("Total Time:", datetime.now() - start_time)
     return jsonify(
         {
             "status": "success",
             "message": response_message.serialize(),
-            "chatStatus": chatStatus,
+            "chatStatus": 1 if len(message_list) + 2 >= MIN_MESSAGE_NUM else 0,
         }
     )
 
 
 @app.route("/generate_message", methods=["POST"])
 def generate_message():
-    global client
     request_messages = request.get_json()["message"]
 
     if "UId" not in session:
         return jsonify({"status": "error", "message": "User not logged in."})
 
     chat = db.Chat.query.filter_by(ChatId=session["ChatId"]).first()
-    messege_list_for_ai = [msg.serialize_for_ai() for msg in chat.Messages]
+    message_list_for_ai = [msg.serialize_for_ai() for msg in chat.Messages]
 
     diary_list = (
         db.Diary.query.join(db.Chat, db.Diary.ChatId == db.Chat.ChatId)
@@ -193,9 +200,7 @@ def generate_message():
 
     response_message = db.Message(
         ChatId=session["ChatId"],
-        Message=ai.generate_diary(client, messege_list_for_ai, d1, d2).replace(
-            "\n", " "
-        ),
+        Message=ai.generate_diary(message_list_for_ai, d1, d2).replace("\n", " "),
         Sender=db.SenderEnum.assistant,
         Time=current_time_kst().time(),
     )
@@ -354,7 +359,6 @@ def get_feeds_by_date(month, day):
 
 
 if __name__ == "__main__":
-    client = ai.create_openai_client()
     app.run(
         host=os.getenv("SERVER_INTERNAL_IP"),
         port=int(os.getenv("SERVER_PORT_NUMBER")),
