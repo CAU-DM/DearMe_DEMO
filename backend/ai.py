@@ -6,6 +6,8 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+client = 0
+
 default_diary_1 = """
 수현, 명석과의 먹방의 날 ,, 수현언니 시험 끝난 기념으로 상도에 새로 생긴 돼지한약방..?에 갔다. 가격은 좀 있었지만 고기 다 구워주시고 맛도 있었다!!
 돼지고기를 저렇게 자개에 가져오는게 넘 웃겼다 ,, 고급진데.. 웃겨,, ㅋㅋㅋㅋㅋ 1차는 간단하게 고기만 먹고 2차로 브롱스 가서 피자랑 윙봉에 맥주 마셨다!
@@ -186,7 +188,7 @@ def trim_conversation_history(history, max_tokens, model, response_token):
     return history
 
 
-def create_openai_client():
+def init():
     global client
     if client != 0:
         return client
@@ -242,5 +244,4 @@ def generate_diary(conversation_history, d1, d2):
     return response.choices[0].message.content.strip()
 
 
-client = 0
-create_openai_client()
+init()
